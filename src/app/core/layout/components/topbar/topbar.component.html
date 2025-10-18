@@ -1,0 +1,15 @@
+<p-menubar [model]="items">
+  <ng-template pTemplate="start">
+    <button
+      pButton
+      icon="pi pi-bars"
+      class="p-button-text"
+      (click)="toggle()"
+    ></button>
+    <span class="font-bold ml-2">Mi Aplicación</span>
+  </ng-template>
+
+  <ng-template pTemplate="end">
+    <button pButton icon="pi pi-user" class="p-button-text">Perfil</button>
+  </ng-template>
+</p-menubar>
