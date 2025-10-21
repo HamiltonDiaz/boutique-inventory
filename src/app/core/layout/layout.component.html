@@ -1,19 +1,37 @@
 <!-- src/app/core/layout/layout.component.html -->
-<div class="flex flex-column min-h-screen">
-  <app-topbar (toggleSidebar)="collapsed = $event"></app-topbar>
+<div class="min-h-screen">
+  <!-- Topbar fijo -->
+  <div class="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
+    <app-topbar (toggleSidebar)="collapsed = $event"></app-topbar>
+  </div>
 
-  <div class="flex flex-1">
-    <div [ngClass]="{ 'hidden md:block': collapsed === true }">
+  <!-- Contenedor principal con margin-top para compensar el topbar fijo -->
+  <div class="flex pt-16"> <!-- Ajusta pt-16 según la altura de tu topbar -->
+    
+    <!-- Sidebar fijo -->
+    <div 
+      [ngClass]="{ 
+        'hidden md:block': collapsed === true,
+        'fixed left-0 top-16 h-[calc(100vh-4rem)] overflow-y-auto bg-white shadow-lg z-40': true
+      }"
+      [style.width]="collapsed ? '0' : '250px'"> <!-- Ajusta el ancho según tu sidebar -->
       <app-sidebar [collapsed]="collapsed"></app-sidebar>
     </div>
 
-    <main class="flex-1 p-3">
-      <p-card class="mt-3">
+    <!-- Contenido principal con scroll -->
+    <main 
+      class="flex-1 p-1 overflow-auto"
+      [ngClass]="{ 'md:ml-[250px]': !collapsed }"
+      [style.height]="'calc(100vh - 4rem)'"> <!-- 4rem = altura del topbar (pt-16) -->
+      
+      <p-card class="mt-1">
         <ng-template #header>
           <app-breadcrumbs />
         </ng-template>
 
-        <router-outlet />
+        <div class="overflow-auto">
+          <router-outlet />
+        </div>
       </p-card>
     </main>
   </div>

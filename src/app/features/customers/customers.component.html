@@ -1,9 +1,9 @@
 <div class="card">
     <p-toast />
-    <p-toolbar styleClass="mb-6">
+    <p-toolbar styleClass="mb-2">
         <ng-template #start>
-            <p-button label="New" icon="pi pi-plus" class="mr-2" (onClick)="openNew()" />
-            <p-button severity="danger" label="Delete" icon="pi pi-trash" outlined (onClick)="deleteSelectedProducts()" [disabled]="!selectedProducts || !selectedProducts.length" />
+            <p-button label="Nuevo" icon="pi pi-plus" class="mr-2" (onClick)="openNew()" />
+            <p-button severity="danger" label="Borrar" icon="pi pi-trash" outlined (onClick)="deleteSelectedProducts()" [disabled]="!selectedProducts || !selectedProducts.length" />
         </ng-template>
 
         <ng-template #end>
@@ -91,12 +91,9 @@
                 </td>
             </tr>
         </ng-template>
-        <ng-template #summary>
-            <div class="flex items-center justify-between">In total there are {{ products ? products.length : 0 }} products.</div>
-        </ng-template>
     </p-table>
 
-    <p-dialog [(visible)]="productDialog" [style]="{ width: '450px' }" header="Product Details" [modal]="true">
+    <p-dialog [(visible)]="productDialog" [style]="{ width: '75vw' }" header="Product Details" [modal]="true">
         <ng-template #content>
             <div class="flex flex-col gap-6">
                 <img [src]="'https://primefaces.org/cdn/primeng/images/demo/product/' + product.image" [alt]="product.image" class="block m-auto pb-4" *ngIf="product.image" />
@@ -156,5 +153,96 @@
         </ng-template>
     </p-dialog>
 
-    <p-confirmDialog [style]="{ width: '450px' }" />
+    <p-confirmDialog [breakpoints]="{'960px': '75vw', '640px': '100vw'}" [style]="{width: '30vw'}" [baseZIndex]="10000"
+    rejectButtonStyleClass="p-button-danger" />
+
+
+
+
+
+
+
+
+<!-- NUEVA TABLA -->
+
+
+    <p-table
+        #table_custom
+        [value]="customersTable"
+        [rows]="10"
+        [columns]="cols"
+        [paginator]="true"
+        [globalFilterFields]="['name', 'country.name', 'representative.name', 'status']"
+        [tableStyle]="{ 'min-width': '75rem' }"
+        [(selection)]="selectedProducts"
+        [rowHover]="true"
+        dataKey="id"
+        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+        [showCurrentPageReport]="true"
+        [scrollable]="true" 
+        scrollHeight="300px"
+    >
+        <ng-template #caption>
+            <div class="flex items-center justify-between">
+                <h5 class="m-0">Clientes</h5>
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-search" />
+                    <input pInputText type="text" (input)="dt?.filterGlobal($any($event.target).value, 'contains')" placeholder="Search..." />
+                </p-iconfield>
+            </div>
+        </ng-template>
+        <ng-template #header>
+            <tr>
+                <th style="width: 3rem">
+                    <p-tableHeaderCheckbox />
+                </th>
+                <th pSortableColumn="name" style="min-width:16rem">
+                    Nombre
+                    <p-sortIcon field="name" />
+                </th>
+                <th pSortableColumn="gender" style="min-width: 8rem">
+                    Género
+                    <p-sortIcon field="gender" />
+                </th>
+                <th pSortableColumn="age" style="min-width:10rem">
+                    Edad
+                    <p-sortIcon field="age" />
+                </th>       
+                <th pSortableColumn="active" style="min-width:10rem">
+                    Activo
+                    <p-sortIcon field="active" />
+                </th>     
+                <th style="min-width: 12rem"></th>
+            </tr>
+        </ng-template>
+        <ng-template #body let-item>
+            <tr>
+                <td style="width: 3rem">
+                    <p-tableCheckbox [value]="item" />
+                </td>
+                <td style="min-width: 12rem">
+                    {{ ((item.persona?.nombre ?? '') + ' ' + (item.persona?.apellido ?? '')) | uppercase }}
+                </td>
+                <td style="min-width: 16rem">{{ item.persona.genero }}</td>       
+                <td>{{ item.persona.edad }}</td>
+                <td>{{item.activo }}</td>
+                <td>
+                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editProduct(product)" />
+                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteProduct(product)" />
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+<!-- FIN NUEVA TABLA -->
+
+
+
+
+
+
+
+
+
+
+
 </div>

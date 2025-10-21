@@ -23,6 +23,10 @@ import { InputIconModule } from 'primeng/inputicon';
 import { Table } from 'primeng/table';
 import { DropdownModule } from 'primeng/dropdown';
 import { ProductService } from './productservice';
+import { HttpClient } from '@angular/common/http';
+import { CustomersService } from '../../core/services/customers/customers.services';
+import { lastValueFrom } from 'rxjs';
+import { CustomersModel } from '../../core/models/customers/customers.model';
 
 interface Column {
   field: string;
@@ -77,6 +81,11 @@ interface Product {
   styleUrl: './customers.component.scss',
 })
 export class CustomersComponent implements OnInit {
+  @ViewChild('dt') dt!: Table;
+
+  customersTable: CustomersModel[] = [];
+
+
   productDialog: boolean = false;
 
   products!: Product[];
@@ -89,7 +98,6 @@ export class CustomersComponent implements OnInit {
 
   statuses!: any[];
 
-  @ViewChild('dt') dt!: Table;
 
   cols!: Column[];
 
@@ -99,15 +107,17 @@ export class CustomersComponent implements OnInit {
     private productService: ProductService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    private _customersService: CustomersService
   ) {}
 
   exportCSV(event?: Event) {
     this.dt.exportCSV();
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.loadDemoData();
+    await this.loadCustomers();
   }
 
   loadDemoData() {
@@ -253,5 +263,18 @@ export class CustomersComponent implements OnInit {
       this.productDialog = false;
       this.product = {};
     }
+  }
+
+
+  //||||||||||||||||||||||||||||||| DATOS REALES DEL COMPONENTE |||||||||||||||||||||||||||||||
+
+  async loadCustomers(): Promise<void>  {
+    const response = await lastValueFrom(
+      this._customersService.findAll()
+    )
+
+    this.customersTable = response;
+    console.log('Clientes cargados:', response);
+    console.log('customersTable:', this.customersTable);
   }
 }
