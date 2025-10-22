@@ -23,10 +23,10 @@ import { InputIconModule } from 'primeng/inputicon';
 import { Table } from 'primeng/table';
 import { DropdownModule } from 'primeng/dropdown';
 import { ProductService } from './productservice';
-import { HttpClient } from '@angular/common/http';
 import { CustomersService } from '../../core/services/customers/customers.services';
 import { lastValueFrom } from 'rxjs';
 import { CustomersModel } from '../../core/models/customers/customers.model';
+import { ICols } from '../../core/dtos/icos.dto';
 
 interface Column {
   field: string;
@@ -40,23 +40,23 @@ interface ExportColumn {
 }
 
 interface Product {
-    id?: string;
-    code?: string;
-    name?: string;
-    description?: string;
-    price?: number;
-    quantity?: number;
-    inventoryStatus?: string;
-    category?: string;
-    image?: string;
-    rating?: number;
+  id?: string;
+  code?: string;
+  name?: string;
+  description?: string;
+  price?: number;
+  quantity?: number;
+  inventoryStatus?: string;
+  category?: string;
+  image?: string;
+  rating?: number;
 }
 
 @Component({
   selector: 'app-customers',
   imports: [
     TableModule,
-    Dialog,    
+    Dialog,
     SelectModule,
     ToastModule,
     ToolbarModule,
@@ -74,18 +74,69 @@ interface Product {
     InputNumber,
     IconFieldModule,
     InputIconModule,
-    ButtonModule
+    ButtonModule,
   ],
   providers: [MessageService, ConfirmationService, ProductService],
   templateUrl: './customers.component.html',
   styleUrl: './customers.component.scss',
 })
 export class CustomersComponent implements OnInit {
-  @ViewChild('dt') dt!: Table;
-
+  @ViewChild('table_custom') table_custom!: Table;
   customersTable: CustomersModel[] = [];
+  selectedCustomers!: CustomersModel[] | null;
 
+  columns: ICols[] = [
+    {
+      field: 'persona.cedula',
+      header: 'Cédula',
+      order: true,
+      filterable: true,
+      class: 'text-left w-10rem',
+      minWidth: '10rem',
+    },
+    {
+      field: 'persona.nombre',
+      header: 'Nombre',
+      order: true,
+      filterable: true,
+      class: 'text-left w-25rem',
+      minWidth: '25rem',
+    },
+    {
+      field: 'persona.genero',
+      header: 'Género',
+      class: 'text-center w-5rem',
+      minWidth: '8rem',
+      order: true,
+      filterable: true,
+    },
+    {
+      field: 'persona.edad',
+      header: 'Edad',
+      class: 'text-center w-5rem',
+      minWidth: '8rem',
+      order: true,
+      filterable: true,
+    },
+    {
+      field: 'activo',
+      header: 'Activo',
+      class: 'text-center w-5rem',
+      minWidth: '8rem',
+      order: true,
+      filterable: true,
+    },
+    {
+      field: 'actions',
+      header: 'Acciones',
+      class: 'text-center w-10rem',
+      minWidth: '10rem',
+      order: false,
+      filterable: true,
+    },
+  ];
 
+  @ViewChild('dt') dt!: Table;
   productDialog: boolean = false;
 
   products!: Product[];
@@ -97,7 +148,6 @@ export class CustomersComponent implements OnInit {
   submitted: boolean = false;
 
   statuses!: any[];
-
 
   cols!: Column[];
 
@@ -265,16 +315,95 @@ export class CustomersComponent implements OnInit {
     }
   }
 
-
   //||||||||||||||||||||||||||||||| DATOS REALES DEL COMPONENTE |||||||||||||||||||||||||||||||
 
-  async loadCustomers(): Promise<void>  {
-    const response = await lastValueFrom(
-      this._customersService.findAll()
-    )
-
-    this.customersTable = response;
-    console.log('Clientes cargados:', response);
-    console.log('customersTable:', this.customersTable);
+  async loadCustomers(): Promise<void> {
+    const response = await lastValueFrom(this._customersService.findAll());
+    if (response.status !== 200) {
+      console.error('Error al cargar los clientes:', response.message);
+      return;
+    }
+    this.customersTable = response.data;
   }
+
+  /**
+   * Obtiene las claves de campo que permiten filtrado en la tabla.
+   *
+   * @returns Array de cadenas con los nombres de campo en `cols` donde `filterable === true`.
+   */
+  getFilterFields(): string[] {
+    return this.columns.filter((col) => col.filterable).map((col) => col.field);
+  }
+
+  openModalNew() {
+    this.product = {};
+    this.submitted = false;
+    this.productDialog = true;
+  }
+
+  editRegister(item: CustomersModel) {
+    console.log('Editar cliente:', item);
+    this.productDialog = true;
+  }
+
+  deleteRegister(item: CustomersModel) {
+    this.confirmationService.confirm({
+      message:
+        '¿Estás seguro de que deseas eliminar el registo ' +
+        `${item.persona.nombre} ${item.persona.apellido}5656`
+          .toUpperCase()
+          .trim() +
+        '?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      accept: async () => {
+        const response = await lastValueFrom(
+          this._customersService.delete(item.id_cliente)
+        ).catch((error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudo eliminar el registro',
+            life: 3000,
+          });
+        });
+        if (response?.status == 200) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Exitoso',
+            detail: 'Registro eliminado',
+            life: 3000,
+          });
+        }
+        await this.loadCustomers();
+      },
+    });
+  }
+
+  deleteAllRegisters() {
+    this.confirmationService.confirm({
+      message:
+        '¿Estás seguro de que deseas eliminar los registros seleccionados?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.products = this.products.filter((val) => {
+          console.log(val); // 👈 imprime cada elemento de this.products
+          return !this.selectedProducts?.includes(val);
+        });
+
+        this.selectedProducts = null;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Successful',
+          detail: 'Products Deleted',
+          life: 3000,
+        });
+      },
+    });
+  }
+    exportDataCSV(event?: Event) {
+        this.table_custom.exportCSV();
+    }
+
 }

@@ -8,7 +8,8 @@ export class ColsModel {
   width?: string
   minWidth?: string
   maxLength?: number
-
+  filterable?: boolean
+  
   constructor(
     field: string,
     header: string,

@@ -14,14 +14,14 @@ export class CustomersService implements CustomersServiceInterface {
 
   constructor() {}
 
-  // findAll(): Observable<ResponseTableModel<CustomersModel>> {
-  //   return this.repository.findAll();
-  // }
-  findAll(): Observable<CustomersModel[]> {
+  findAll(): Observable<ResponseModel<CustomersModel[]>> {
     return this.repository.findAll();
   }
+  // findAll(): Observable<CustomersModel[]> {
+  //   return this.repository.findAll();
+  // }
 
-  findById(id: number): Observable<ResponseModel<CustomersModel>> {
+  findById(id: string): Observable<ResponseModel<CustomersModel>> {
     return this.repository.findById(id);
   }
 
@@ -33,7 +33,7 @@ export class CustomersService implements CustomersServiceInterface {
     return this.repository.update(data);
   }
 
-  delete(id: number): Observable<ResponseModel<boolean>> {
+  delete(id: string): Observable<ResponseModel<boolean>> {
     return this.repository.delete(id);
   }
 }

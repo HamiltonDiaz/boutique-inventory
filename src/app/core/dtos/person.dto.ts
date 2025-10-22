@@ -7,4 +7,5 @@ export interface PersonDto {
     ciudad: string
     edad: number
     id_pais: number
+    cedula: string
 }

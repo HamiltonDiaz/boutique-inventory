@@ -16,21 +16,21 @@ export class CustomersRepository implements CustomersRepositoryInterface {
 
   constructor(private _httpClient: HttpClient) {}
   
-  // findAll(    
-  // ): Observable<ResponseTableModel<CustomersModel>> {
-  //   return this._httpClient.get<ResponseTableModel<CustomersModel>>(
-  //     `${this.API_URL}`
-  //   )
-  // }
-
   findAll(    
-  ): Observable<CustomersModel[]> {
-    return this._httpClient.get<CustomersModel[]>(
+  ): Observable<ResponseModel<CustomersModel[]>> {
+    return this._httpClient.get<ResponseModel<CustomersModel[]>>(
       `${this.API_URL}`
     )
   }
 
-  findById(id: number): Observable<ResponseModel<CustomersModel>> {
+  // findAll(    
+  // ): Observable<CustomersModel[]> {
+  //   return this._httpClient.get<CustomersModel[]>(
+  //     `${this.API_URL}`
+  //   )
+  // }
+
+  findById(id: string): Observable<ResponseModel<CustomersModel>> {
     return this._httpClient.get<ResponseModel<CustomersModel>>(
       `${this.API_URL}${id}`
     )
@@ -53,7 +53,7 @@ export class CustomersRepository implements CustomersRepositoryInterface {
     )
   }
 
-  delete(id: number): Observable<ResponseModel<boolean>> {
+  delete(id: string): Observable<ResponseModel<boolean>> {
     return this._httpClient.delete<ResponseModel<boolean>>(
       `${this.API_URL}${id}`
     )

@@ -2,14 +2,13 @@ import { Observable } from 'rxjs';
 import { ResponseModel } from '../../models/common/response.model';
 import { CustomersModel } from '../../models/customers/customers.model';
 import { CreateCustomerDto } from '../../dtos/create-customer.dto';
-import { ResponseTableModel } from '../../models/common/response-table.model';
 import { UpdateCustomerDto } from '../../dtos/update-customer.dto';
 
 export interface CustomersRepositoryInterface {
-//   findAll(): Observable<ResponseTableModel<CustomersModel>>;
-  findAll(): Observable<CustomersModel[]>;
-  findById(id: number): Observable<ResponseModel<CustomersModel>>;
+  findAll(): Observable<ResponseModel<CustomersModel[]>>;
+  // findAll(): Observable<CustomersModel[]>;
+  findById(id: string): Observable<ResponseModel<CustomersModel>>;
   create(data: CreateCustomerDto): Observable<ResponseModel<CustomersModel>>;
   update(data: UpdateCustomerDto): Observable<ResponseModel<boolean>>;
-  delete(id: number): Observable<ResponseModel<boolean>>;
+  delete(id: string): Observable<ResponseModel<boolean>>;
 }

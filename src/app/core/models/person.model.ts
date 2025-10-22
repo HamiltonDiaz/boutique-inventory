@@ -7,8 +7,8 @@ export class PersonModel {
   genero: string;
   ciudad: string;
   edad: number;
-  id_pais: number;
-  full_name?: string;
+  id_pais: number;  
+  cedula: string;
 
   constructor(
     id_persona: number,
@@ -19,7 +19,9 @@ export class PersonModel {
     genero: string,
     ciudad: string,
     edad: number,
-    id_pais: number    
+    id_pais: number,
+    cedula: string
+    
   ) {
     this.id_persona = id_persona;
     this.nombre = nombre;
@@ -30,7 +32,6 @@ export class PersonModel {
     this.ciudad = ciudad;
     this.edad = edad;
     this.id_pais = id_pais;
-    this.full_name = `${nombre} ${apellido}`.toUpperCase();
-
+    this.cedula=cedula;
   }
 }
