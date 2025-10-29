@@ -1,7 +1,13 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ConfirmationService, MessageService } from 'primeng/api';
-// import { Product } from '@/domain/product';
-// import { ProductService } from '@/service/productservice';
 import { TableModule } from 'primeng/table';
 import { Dialog } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
@@ -10,48 +16,26 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
-import { CommonModule } from '@angular/common';
-import { FileUpload } from 'primeng/fileupload';
-import { SelectModule } from 'primeng/select';
-import { Tag } from 'primeng/tag';
-import { RadioButton } from 'primeng/radiobutton';
-import { Rating } from 'primeng/rating';
-import { FormsModule } from '@angular/forms';
-import { InputNumber } from 'primeng/inputnumber';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { Table } from 'primeng/table';
-import { DropdownModule } from 'primeng/dropdown';
-import { ProductService } from './productservice';
+import { SelectModule } from 'primeng/select';
 import { CustomersService } from '../../core/services/customers/customers.services';
 import { lastValueFrom } from 'rxjs';
 import { CustomersModel } from '../../core/models/customers/customers.model';
 import { ICols } from '../../core/dtos/icos.dto';
-
-interface Column {
-  field: string;
-  header: string;
-  customExportHeader?: string;
-}
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { HelpersService } from '../../core/services/common/helper.service';
+import { CreateCustomerDto } from '../../core/dtos/create-customer.dto';
+import { UpdateCustomerDto } from '../../core/dtos/update-customer.dto';
+import { ListElementDto } from '../../core/dtos/list-element.dto';
+import { CountryService } from '../../core/services/country/country.services';
+import { CountryModel } from '../../core/models/country/country.model';
 
 interface ExportColumn {
   title: string;
   dataKey: string;
 }
-
-interface Product {
-  id?: string;
-  code?: string;
-  name?: string;
-  description?: string;
-  price?: number;
-  quantity?: number;
-  inventoryStatus?: string;
-  category?: string;
-  image?: string;
-  rating?: number;
-}
-
 @Component({
   selector: 'app-customers',
   imports: [
@@ -64,19 +48,15 @@ interface Product {
     InputTextModule,
     TextareaModule,
     CommonModule,
-    FileUpload,
-    DropdownModule,
-    Tag,
-    RadioButton,
-    Rating,
     InputTextModule,
-    FormsModule,
-    InputNumber,
     IconFieldModule,
     InputIconModule,
     ButtonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    ToggleSwitchModule,
   ],
-  providers: [MessageService, ConfirmationService, ProductService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './customers.component.html',
   styleUrl: './customers.component.scss',
 })
@@ -84,7 +64,13 @@ export class CustomersComponent implements OnInit {
   @ViewChild('table_custom') table_custom!: Table;
   customersTable: CustomersModel[] = [];
   selectedCustomers!: CustomersModel[] | null;
-
+  public frm!: FormGroup;
+  createRegister: boolean = true;
+  createEditDialog: boolean = false;
+  titleDialog: string = '';
+  loadingButtonSave: boolean = false;
+  idRegisterToEdit: string = '';
+  optionsCountries: ListElementDto[] = [];
   columns: ICols[] = [
     {
       field: 'persona.cedula',
@@ -136,186 +122,76 @@ export class CustomersComponent implements OnInit {
     },
   ];
 
-  @ViewChild('dt') dt!: Table;
-  productDialog: boolean = false;
-
-  products!: Product[];
-
-  product!: Product;
-
-  selectedProducts!: Product[] | null;
-
-  submitted: boolean = false;
-
-  statuses!: any[];
-
-  cols!: Column[];
-
-  exportColumns!: ExportColumn[];
-
   constructor(
-    private productService: ProductService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private cd: ChangeDetectorRef,
-    private _customersService: CustomersService
+    private _customersService: CustomersService,
+    private _countryService: CountryService,
+    private readonly formBuilder: FormBuilder,
+    readonly _helperService: HelpersService
   ) {}
 
-  exportCSV(event?: Event) {
-    this.dt.exportCSV();
-  }
-
   async ngOnInit() {
-    this.loadDemoData();
+    this.loadForm();
+    await this.loadCountriesOptions();
     await this.loadCustomers();
   }
 
-  loadDemoData() {
-    this.productService.getProducts().then((data) => {
-      this.products = data;
-      this.cd.markForCheck();
-    });
-
-    this.statuses = [
-      { label: 'INSTOCK', value: 'instock' },
-      { label: 'LOWSTOCK', value: 'lowstock' },
-      { label: 'OUTOFSTOCK', value: 'outofstock' },
-    ];
-
-    this.cols = [
-      { field: 'code', header: 'Code', customExportHeader: 'Product Code' },
-      { field: 'name', header: 'Name' },
-      { field: 'image', header: 'Image' },
-      { field: 'price', header: 'Price' },
-      { field: 'category', header: 'Category' },
-    ];
-
-    this.exportColumns = this.cols.map((col) => ({
-      title: col.header,
-      dataKey: col.field,
-    }));
-  }
-
-  openNew() {
-    this.product = {};
-    this.submitted = false;
-    this.productDialog = true;
-  }
-
-  editProduct(product: Product) {
-    this.product = { ...product };
-    this.productDialog = true;
-  }
-
-  deleteSelectedProducts() {
-    this.confirmationService.confirm({
-      message: 'Are you sure you want to delete the selected products?',
-      header: 'Confirm',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        this.products = this.products.filter(
-          (val) => !this.selectedProducts?.includes(val)
-        );
-        this.selectedProducts = null;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Products Deleted',
-          life: 3000,
-        });
-      },
+  loadForm(): void {
+    this.frm = this.formBuilder.group({
+      direccion: [{ value: null, disabled: false }, Validators.required],
+      activo: [{ value: true, disabled: false }],
+      cedula: [
+        { value: null, disabled: false },
+        Validators.compose([
+          Validators.required,
+          Validators.maxLength(12),
+          Validators.minLength(6),
+          Validators.pattern('^[0-9]*$'),
+        ]),
+      ],
+      nombre: [{ value: null, disabled: false }, Validators.required],
+      apellido: [{ value: null, disabled: false }, Validators.required],
+      correo: [
+        { value: null, disabled: false },
+        Validators.compose([Validators.required, Validators.email]),
+      ],
+      telefono: [
+        { value: null, disabled: false },
+        Validators.compose([
+          Validators.required,
+          Validators.maxLength(10),
+          Validators.minLength(6),
+          Validators.pattern('^[0-9]*$'),
+        ]),
+      ],
+      genero: [{ value: null, disabled: false }, Validators.required],
+      ciudad: [{ value: null, disabled: false }, Validators.required],
+      edad: [{ value: null, disabled: false }, Validators.required],
+      id_pais: [{ value: null, disabled: false }, Validators.required],
     });
   }
 
-  hideDialog() {
-    this.productDialog = false;
-    this.submitted = false;
-  }
-
-  deleteProduct(product: Product) {
-    this.confirmationService.confirm({
-      message: 'Are you sure you want to delete ' + product.name + '?',
-      header: 'Confirm',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        this.products = this.products.filter((val) => val.id !== product.id);
-        this.product = {};
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Product Deleted',
-          life: 3000,
-        });
-      },
-    });
-  }
-
-  findIndexById(id: string): number {
-    let index = -1;
-    for (let i = 0; i < this.products.length; i++) {
-      if (this.products[i].id === id) {
-        index = i;
-        break;
-      }
+  async loadCountriesOptions(): Promise<void> {
+    const response = await lastValueFrom(this._countryService.findAll());
+    if (response.status !== 200 && response.status !== 204) {
+      console.error('Error al cargar los países:', response.message);
+      return;
     }
-
-    return index;
+    this.optionsCountries = response.data.map((country: CountryModel) => ({
+      value: country.id_pais,
+      name: country.nombre
+  }));
   }
 
-  createId(): string {
-    let id = '';
-    var chars =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (var i = 0; i < 5; i++) {
-      id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return id;
+  exportCSV(event?: Event) {
+    this.table_custom.exportCSV();
   }
 
-  getSeverity(status: string): string | undefined {
-    switch (status) {
-      case 'INSTOCK':
-        return 'success';
-      case 'LOWSTOCK':
-        return 'warn';
-      case 'OUTOFSTOCK':
-        return 'danger';
-      default:
-        return undefined;
-    }
+  hideDialog(): void {
+    this.createEditDialog = false;
+    this.createRegister = true;
   }
-
-  saveProduct() {
-    this.submitted = true;
-
-    if (this.product.name?.trim()) {
-      if (this.product.id) {
-        this.products[this.findIndexById(this.product.id)] = this.product;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Product Updated',
-          life: 3000,
-        });
-      } else {
-        this.product.id = this.createId();
-        this.product.image = 'product-placeholder.svg';
-        this.products.push(this.product);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Product Created',
-          life: 3000,
-        });
-      }
-
-      this.products = [...this.products];
-      this.productDialog = false;
-      this.product = {};
-    }
-  }
-
-  //||||||||||||||||||||||||||||||| DATOS REALES DEL COMPONENTE |||||||||||||||||||||||||||||||
 
   async loadCustomers(): Promise<void> {
     const response = await lastValueFrom(this._customersService.findAll());
@@ -336,23 +212,131 @@ export class CustomersComponent implements OnInit {
   }
 
   openModalNew() {
-    this.product = {};
-    this.submitted = false;
-    this.productDialog = true;
+    this.createRegister = true;
+    this.titleDialog = 'Crear nuevo registro';
+    this.idRegisterToEdit = '';
+    this.createEditDialog = true;
   }
 
-  editRegister(item: CustomersModel) {
-    console.log('Editar cliente:', item);
-    this.productDialog = true;
+  buildDataToSave(): CreateCustomerDto | UpdateCustomerDto {
+    const formValues = this.frm.getRawValue();
+    return {
+      cliente: {
+        direccion: formValues.direccion,
+        activo: formValues.activo,
+      },
+      persona: {
+        cedula: formValues.cedula,
+        nombre: formValues.nombre,
+        apellido: formValues.apellido,
+        correo: formValues.correo,
+        telefono: formValues.telefono,
+        genero: formValues.genero,
+        ciudad: formValues.ciudad,
+        edad: formValues.edad,
+        id_pais: formValues.id_pais,
+      },
+    };
   }
+
+  buildDataToUpdate(item: CustomersModel):void {  
+    this.frm.controls['direccion'].setValue(item.direccion);
+    this.frm.controls['activo'].setValue(item.activo);
+    this.frm.controls['cedula'].setValue(item.persona.cedula);
+    this.frm.controls['nombre'].setValue(item.persona.nombre);
+    this.frm.controls['apellido'].setValue(item.persona.apellido);
+    this.frm.controls['correo'].setValue(item.persona.email);
+    this.frm.controls['telefono'].setValue(item.persona.telefono);
+    this.frm.controls['genero'].setValue(item.persona.genero);
+    this.frm.controls['ciudad'].setValue(item.persona.ciudad);
+    this.frm.controls['edad'].setValue(item.persona.edad);
+    this.frm.controls['id_pais'].setValue( item.persona.pais.id_pais);    
+  }
+
+  async save() {
+    if (this.frm.invalid) {
+      this.frm.markAllAsTouched();
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Mensaje del sistema.',
+        detail: 'Llenar todos los campos obligatorios',
+        life: 3000,
+      });
+      return;
+    }
+    this.loadingButtonSave = true;
+    const data: CreateCustomerDto | UpdateCustomerDto = this.buildDataToSave();
+
+    if (this.createRegister) {
+      const response = await lastValueFrom(
+        this._customersService.create(data)
+      ).catch((error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo crear el registro: ' + error.message,
+          life: 3000,
+        });
+      });
+      if (response?.status == 200) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Exitoso',
+          detail: 'Registro creado exitosamente',
+          life: 3000,
+        });
+      }
+    }
+
+    if (!this.createRegister) {
+      console.log('ID a actualizar:', data);
+      const response = await lastValueFrom(
+        this._customersService.update(this.idRegisterToEdit,data)
+      ).catch((error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo actualizar el registro: ' + error.message,
+          life: 3000,
+        });
+      });
+      if (response?.status == 200) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Exitoso',
+          detail: 'Registro actualizado exitosamente',
+          life: 3000,
+        });
+      }
+    }
+
+    this.loadingButtonSave = false;
+    await this.loadCustomers();
+    this.clearForm()
+    this.hideDialog();
+  }
+
+
+  clearForm() {
+    this.frm.reset();
+    this.frm.controls['activo'].setValue(true);
+  }
+  
+  editRegister(item: CustomersModel) {    
+    this.idRegisterToEdit = item.id_cliente;
+    this.titleDialog = 'Editar registro';
+    this.createRegister = false;
+    this.createEditDialog = true;
+    this.buildDataToUpdate(item);
+  }
+
+
 
   deleteRegister(item: CustomersModel) {
     this.confirmationService.confirm({
       message:
         '¿Estás seguro de que deseas eliminar el registo ' +
-        `${item.persona.nombre} ${item.persona.apellido}5656`
-          .toUpperCase()
-          .trim() +
+        `${item.persona.nombre} ${item.persona.apellido}`.toUpperCase().trim() +
         '?',
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
@@ -360,6 +344,7 @@ export class CustomersComponent implements OnInit {
         const response = await lastValueFrom(
           this._customersService.delete(item.id_cliente)
         ).catch((error) => {
+          console.error('Error al eliminar el registro:', error);
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
@@ -386,24 +371,10 @@ export class CustomersComponent implements OnInit {
         '¿Estás seguro de que deseas eliminar los registros seleccionados?',
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        this.products = this.products.filter((val) => {
-          console.log(val); // 👈 imprime cada elemento de this.products
-          return !this.selectedProducts?.includes(val);
-        });
-
-        this.selectedProducts = null;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Products Deleted',
-          life: 3000,
-        });
-      },
+      accept: () => {},
     });
   }
-    exportDataCSV(event?: Event) {
-        this.table_custom.exportCSV();
-    }
-
+  exportDataCSV(event?: Event) {
+    this.table_custom.exportCSV();
+  }
 }

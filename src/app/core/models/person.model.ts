@@ -1,3 +1,5 @@
+import { CountryDto } from "../dtos/country.dto";
+
 export class PersonModel {
   id_persona: number;
   nombre: string;
@@ -9,6 +11,7 @@ export class PersonModel {
   edad: number;
   id_pais: number;  
   cedula: string;
+  pais: CountryDto
 
   constructor(
     id_persona: number,
@@ -20,7 +23,8 @@ export class PersonModel {
     ciudad: string,
     edad: number,
     id_pais: number,
-    cedula: string
+    cedula: string,
+    pais: CountryDto
     
   ) {
     this.id_persona = id_persona;
@@ -33,5 +37,6 @@ export class PersonModel {
     this.edad = edad;
     this.id_pais = id_pais;
     this.cedula=cedula;
+    this.pais=pais;
   }
 }

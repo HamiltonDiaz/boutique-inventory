@@ -4,7 +4,6 @@ import { HttpClient } from '@angular/common/http'
 
 import { CustomersRepositoryInterface } from './customers.repository.interface'
 import { environment } from '../../../../enviroments/enviroment.dev'
-import { ResponseTableModel } from '../../models/common/response-table.model'
 import { CustomersModel } from '../../models/customers/customers.model'
 import { ResponseModel } from '../../models/common/response.model'
 import { CreateCustomerDto } from '../../dtos/create-customer.dto'
@@ -46,9 +45,9 @@ export class CustomersRepository implements CustomersRepositoryInterface {
   }
 
 
-  update(data: UpdateCustomerDto): Observable<ResponseModel<boolean>> {
+  update(id: string, data: UpdateCustomerDto): Observable<ResponseModel<boolean>> {
     return this._httpClient.patch<ResponseModel<boolean>>(
-      `${this.API_URL}`,
+      `${this.API_URL}${id}`,
       data
     )
   }

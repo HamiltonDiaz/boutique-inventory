@@ -16,10 +16,19 @@ export class SidebarComponent {
   items: MenuItem[] = [
     { label: 'Dashboard', icon: 'pi pi-chart-bar', routerLink: ['/dashboard'] },
     {
+      label: 'Parámetros',
+      icon: 'pi pi-cog',
+      items: [
+        { label: 'Países', icon: 'pi pi-map', routerLink: ['/country'] },
+        { label: 'Categorías', icon: 'pi pi-box', routerLink: ['/category'] },
+        { label: 'Usuarios', icon: 'pi pi-users', routerLink: ['/user'] },
+      ],
+    },
+    {
       label: 'Gestión',
       icon: 'pi pi-briefcase',
       items: [
-        { label: 'Clientes', icon: 'pi pi-users', routerLink: ['/customers'] },
+        { label: 'Clientes', icon: 'pi pi-id-card', routerLink: ['/customers'] },
         { label: 'Productos', icon: 'pi pi-box', routerLink: ['/products'] },
       ],
     },

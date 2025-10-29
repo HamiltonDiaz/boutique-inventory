@@ -1,3 +1,5 @@
+import { CountryDto } from "./country.dto"
+
 export interface PersonDto {
     nombre: string
     apellido: string
@@ -8,4 +10,5 @@ export interface PersonDto {
     edad: number
     id_pais: number
     cedula: string
+    pais?: CountryDto
 }

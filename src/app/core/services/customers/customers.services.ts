@@ -1,6 +1,5 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ResponseTableModel } from '../../models/common/response-table.model';
 import { CustomersModel } from '../../models/customers/customers.model';
 import { CustomersRepository } from '../../repos/customers/customers.repository';
 import { ResponseModel } from '../../models/common/response.model';
@@ -29,8 +28,8 @@ export class CustomersService implements CustomersServiceInterface {
     return this.repository.create(data);
   }
 
-  update(data: UpdateCustomerDto): Observable<ResponseModel<boolean>> {
-    return this.repository.update(data);
+  update(id: string,data: UpdateCustomerDto): Observable<ResponseModel<boolean>> {
+    return this.repository.update(id, data);
   }
 
   delete(id: string): Observable<ResponseModel<boolean>> {

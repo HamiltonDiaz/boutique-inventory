@@ -9,6 +9,6 @@ export interface CustomersRepositoryInterface {
   // findAll(): Observable<CustomersModel[]>;
   findById(id: string): Observable<ResponseModel<CustomersModel>>;
   create(data: CreateCustomerDto): Observable<ResponseModel<CustomersModel>>;
-  update(data: UpdateCustomerDto): Observable<ResponseModel<boolean>>;
+  update(id: string, data: UpdateCustomerDto): Observable<ResponseModel<boolean>>;
   delete(id: string): Observable<ResponseModel<boolean>>;
 }

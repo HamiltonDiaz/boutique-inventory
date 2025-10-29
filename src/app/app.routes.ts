@@ -23,12 +23,38 @@ export const routes: Routes = [
         data: { breadcrumb: 'Clientes' },
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'country',
+        loadComponent: () =>
+          import('./features/country/country.component').then(
+            (m) => m.CountryComponent
+          ),
+        data: { breadcrumb: 'País' },
+      },
+      {
+        path: 'category',
+        loadComponent: () =>
+          import('./features/category/category.component').then(
+            (m) => m.CategoryComponent
+          ),
+        data: { breadcrumb: 'Categoría' },
+      },
+      {
+        path: 'user',
+        loadComponent: () =>
+          import('./features/user/user.component').then(
+            (m) => m.UserComponent
+          ),
+        data: { breadcrumb: 'Usuarios' },
+      },
     ],
   },
   {
     path: 'auth',
     loadComponent: () =>
-      import('./features/auth/login/login.component').then((m) => m.LoginComponent),
+      import('./features/auth/login/login.component').then(
+        (m) => m.LoginComponent
+      ),
   },
   { path: '**', redirectTo: '' },
 ];

@@ -1,301 +1,9 @@
 <div class="card">
   <p-toast />
-  <p-toolbar styleClass="mb-2">
-    <ng-template #start>
-      <p-button
-        label="Nuevo"
-        icon="pi pi-plus"
-        class="mr-2"
-        (onClick)="openNew()"
-      />
-      <p-button
-        severity="danger"
-        label="Borrar"
-        icon="pi pi-trash"
-        outlined
-        (onClick)="deleteSelectedProducts()"
-        [disabled]="!selectedProducts || !selectedProducts.length"
-      />
-    </ng-template>
-
-    <ng-template #end>
-      <p-fileUpload
-        mode="basic"
-        accept="image/*"
-        [maxFileSize]="1000000"
-        label="Import"
-        chooseLabel="Import"
-        auto
-        customUpload
-        class="mr-2 inline-block"
-        [chooseButtonProps]="{ severity: 'secondary' }"
-      />
-      <p-button
-        label="Export"
-        icon="pi pi-upload"
-        severity="secondary"
-        (onClick)="exportCSV($event)"
-      />
-    </ng-template>
-  </p-toolbar>
-
-  <p-table
-    #dt
-    [value]="products"
-    [rows]="10"
-    [columns]="cols"
-    [paginator]="true"
-    [globalFilterFields]="[
-      'name',
-      'country.name',
-      'representative.name',
-      'status'
-    ]"
-    [tableStyle]="{ 'min-width': '75rem' }"
-    [(selection)]="selectedProducts"
-    [rowHover]="true"
-    dataKey="id"
-    currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
-    [showCurrentPageReport]="true"
-    [scrollable]="true"
-    scrollHeight="300px"
-  >
-    <ng-template #caption>
-      <div class="flex items-center justify-between">
-        <h5 class="m-0">Manage Products</h5>
-        <p-iconfield>
-          <p-inputicon styleClass="pi pi-search" />
-          <input
-            pInputText
-            type="text"
-            (input)="dt?.filterGlobal($any($event.target).value, 'contains')"
-            placeholder="Search..."
-          />
-        </p-iconfield>
-      </div>
-    </ng-template>
-    <ng-template #header>
-      <tr>
-        <th style="width: 3rem">
-          <p-tableHeaderCheckbox />
-        </th>
-        <th style="min-width: 16rem">Code</th>
-        <th pSortableColumn="name" style="min-width: 16rem">
-          Name
-          <p-sortIcon field="name" />
-        </th>
-        <th>Image</th>
-        <th pSortableColumn="price" style="min-width: 8rem">
-          Price
-          <p-sortIcon field="price" />
-        </th>
-        <th pSortableColumn="category" style="min-width: 10rem">
-          Category
-          <p-sortIcon field="category" />
-        </th>
-        <th pSortableColumn="rating" style="min-width: 12rem">
-          Reviews
-          <p-sortIcon field="rating" />
-        </th>
-        <th pSortableColumn="inventoryStatus" style="min-width: 12rem">
-          Status
-          <p-sortIcon field="inventoryStatus" />
-        </th>
-        <th style="min-width: 12rem"></th>
-      </tr>
-    </ng-template>
-    <ng-template #body let-product>
-      <tr>
-        <td style="width: 3rem">
-          <p-tableCheckbox [value]="product" />
-        </td>
-        <td style="min-width: 12rem">{{ product.code }}</td>
-        <td style="min-width: 16rem">{{ product.name }}</td>
-        <td>
-          <img
-            [src]="
-              'https://primefaces.org/cdn/primeng/images/demo/product/' +
-              product.image
-            "
-            [alt]="product.name"
-            style="width: 64px"
-            class="rounded"
-          />
-        </td>
-        <td>{{ product.price | currency : "USD" }}</td>
-        <td>{{ product.category }}</td>
-        <td>
-          <p-rating [(ngModel)]="product.rating" [readonly]="true" />
-        </td>
-        <td>
-          <p-tag
-            [value]="product.inventoryStatus"
-            [severity]="getSeverity(product.inventoryStatus)"
-          />
-        </td>
-        <td>
-          <p-button
-            icon="pi pi-pencil"
-            class="mr-2"
-            [rounded]="true"
-            [outlined]="true"
-            (click)="editProduct(product)"
-          />
-          <p-button
-            icon="pi pi-trash"
-            severity="danger"
-            [rounded]="true"
-            [outlined]="true"
-            (click)="deleteProduct(product)"
-          />
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
-
-  <p-dialog
-    [(visible)]="productDialog"
-    [style]="{ width: '75vw' }"
-    header="Product Details"
-    [modal]="true"
-  >
-    <ng-template #content>
-      <div class="flex flex-col gap-6">
-        <img
-          [src]="
-            'https://primefaces.org/cdn/primeng/images/demo/product/' +
-            product.image
-          "
-          [alt]="product.image"
-          class="block m-auto pb-4"
-          *ngIf="product.image"
-        />
-        <div>
-          <label for="name" class="block font-bold mb-3">Name</label>
-          <input
-            type="text"
-            pInputText
-            id="name"
-            [(ngModel)]="product.name"
-            required
-            autofocus
-            fluid
-          />
-          <small class="text-red-500" *ngIf="submitted && !product.name"
-            >Name is required.</small
-          >
-        </div>
-        <div>
-          <label for="description" class="block font-bold mb-3"
-            >Description</label
-          >
-          <textarea
-            id="description"
-            pTextarea
-            [(ngModel)]="product.description"
-            required
-            rows="3"
-            cols="20"
-            fluid
-          ></textarea>
-        </div>
-
-        <div>
-          <label for="inventoryStatus" class="block font-bold mb-3"
-            >Inventory Status</label
-          >
-          <p-select
-            [(ngModel)]="product.inventoryStatus"
-            inputId="inventoryStatus"
-            [options]="statuses"
-            optionLabel="label"
-            placeholder="Select a Status"
-            fluid
-          />
-        </div>
-
-        <div>
-          <span class="block font-bold mb-4">Category</span>
-          <div class="grid grid-cols-12 gap-4">
-            <div class="flex items-center gap-2 col-span-6">
-              <p-radiobutton
-                id="category1"
-                name="category"
-                value="Accessories"
-                [(ngModel)]="product.category"
-              />
-              <label for="category1">Accessories</label>
-            </div>
-            <div class="flex items-center gap-2 col-span-6">
-              <p-radiobutton
-                id="category2"
-                name="category"
-                value="Clothing"
-                [(ngModel)]="product.category"
-              />
-              <label for="category2">Clothing</label>
-            </div>
-            <div class="flex items-center gap-2 col-span-6">
-              <p-radiobutton
-                id="category3"
-                name="category"
-                value="Electronics"
-                [(ngModel)]="product.category"
-              />
-              <label for="category3">Electronics</label>
-            </div>
-            <div class="flex items-center gap-2 col-span-6">
-              <p-radiobutton
-                id="category4"
-                name="category"
-                value="Fitness"
-                [(ngModel)]="product.category"
-              />
-              <label for="category4">Fitness</label>
-            </div>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-6">
-            <label for="price" class="block font-bold mb-3">Price</label>
-            <p-inputnumber
-              id="price"
-              [(ngModel)]="product.price"
-              mode="currency"
-              currency="USD"
-              locale="en-US"
-              fluid
-            />
-          </div>
-          <div class="col-span-6">
-            <label for="quantity" class="block font-bold mb-3">Quantity</label>
-            <p-inputnumber id="quantity" [(ngModel)]="product.quantity" fluid />
-          </div>
-        </div>
-      </div>
-    </ng-template>
-
-    <ng-template #footer>
-      <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-      <p-button label="Save" icon="pi pi-check" (click)="saveProduct()" />
-    </ng-template>
-  </p-dialog>
-
-  <p-confirmDialog
-    [breakpoints]="{ '960px': '75vw', '640px': '100vw' }"
-    [style]="{ width: '30vw' }"
-    [baseZIndex]="10000"
-    rejectButtonStyleClass="p-button-danger"
-  />
-
-
-
-
 
   <!-- NUEVO HEADER -->
 
-<p-toolbar styleClass="mb-2">
+  <p-toolbar styleClass="mb-2">
     <ng-template #start>
       <p-button
         label="Nuevo"
@@ -322,7 +30,6 @@
       />
     </ng-template>
   </p-toolbar>
-
 
   <!-- FIN NUEVO HEADER -->
 
@@ -369,7 +76,7 @@
 
         <ng-container *ngFor="let col of columns">
           <th
-            *ngIf="col.field != 'actions'"            
+            *ngIf="col.field != 'actions'"
             [ngStyle]="{ 'min-width': col.minWidth }"
             [ngClass]="col.class"
             [pSortableColumn]="col.order ? col.field : undefined"
@@ -393,10 +100,10 @@
         <td style="width: 3rem">
           <p-tableCheckbox [value]="item" />
         </td>
-        <td  >
+        <td>
           {{ item.persona.cedula }}
         </td>
-        <td >
+        <td>
           {{
             (item.persona?.nombre ?? "") + " " + (item.persona?.apellido ?? "")
               | uppercase
@@ -441,4 +148,243 @@
     </ng-template>
   </p-table>
   <!-- FIN NUEVA TABLA -->
+
+  <!-- MODAL CLIENTES -->
+  <p-dialog
+    [(visible)]="createEditDialog"
+    [style]="{ width: '75vw' }"
+    [header]="titleDialog"
+    [modal]="true"
+  >
+    <ng-template #content>
+      <form [formGroup]="frm" class="grid">
+        <!--Estado Cédula y nombre  -->
+        <div class="col-6 md:col-3 lg:col-1 field">
+          <label for="activo" class="block">Estado</label>
+          <p-toggleswitch id="activo" formControlName="activo"></p-toggleswitch>
+        </div>
+
+        <div class="col-12 md:col-9 lg:col-2 field">
+          <label for="cedula" class="block">Cédula</label>
+          <input
+            pInputText
+            id="cedula"
+            formControlName="cedula"
+            class="w-full"
+            [ngClass]="
+              _helperService.getFormControlNgClass(
+                frm,
+                'cedula',
+                'ng-invalid ng-dirty'
+              )
+            "
+          />
+
+          @if (_helperService.getFormControlNgClass(frm, 'cedula') &&
+          frm.controls['cedula'].hasError('required')) {
+          <small class="text-red-500"> La cédula es requerida </small>
+          } 
+          @if (_helperService.getFormControlNgClass(frm, 'cedula') &&
+          frm.controls['cedula'].hasError('minlength')) {
+          <small class="text-red-500">
+            La cédula requiere mínimo de 6 números
+          </small>
+          } @if (_helperService.getFormControlNgClass(frm, 'cedula') &&
+          frm.controls['cedula'].hasError('maxlength')) {
+          <small class="text-red-500">
+            La cédula requiere menos de 12 números
+          </small>
+          } @if ( _helperService.getFormControlNgClass(frm, 'cedula') &&
+          frm.controls['cedula'].hasError('pattern')) {
+          <small class="text-red-500"> La cédula sólo permite números </small>
+          }
+        </div>
+
+        <div class="col-12 md:col-6 lg:col-3 field">
+          <label for="nombre" class="block">Nombres</label>
+          <input
+            pInputText
+            id="nombre"
+            formControlName="nombre"
+            class="w-full"
+          />
+          @if (_helperService.getFormControlNgClass(frm, 'nombre') &&
+          frm.controls['nombre'].hasError('required')) {
+          <small class="text-red-500"> Los nombres son requeridos </small>
+          }
+        </div>
+
+        <div class="col-12 md:col-6 lg:col-3 field">
+          <label for="apellido" class="block">Apellidos</label>
+          <input
+            pInputText
+            id="apellido"
+            formControlName="apellido"
+            class="w-full"
+          />
+          @if (_helperService.getFormControlNgClass(frm, 'apellido') &&
+          frm.controls['apellido'].hasError('required')) {
+          <small class="text-red-500"> Los apellidos son requeridos </small>
+          }
+        </div>
+
+        <!-- Género y Edad -->
+        <div class="col-12 md:col-6 lg:col-2 field">
+          <label for="genero" class="block">Género</label>
+          <p-select
+            id="genero"
+            [options]="[
+              { name: 'Masculino', value: 'M' },
+              { name: 'Femenino', value: 'F' }
+            ]"
+            optionLabel="name"
+            optionValue="value"
+            formControlName="genero"
+            placeholder="Género"
+            showClear="true"
+            appendTo="body"
+            [filter]="true"
+            filterBy="name"
+            class="w-full"
+          ></p-select>
+          @if (_helperService.getFormControlNgClass(frm, 'apellido') &&
+          frm.controls['apellido'].hasError('required')) {
+          <small class="text-red-500"> Género es requerido </small>
+          }
+        </div>
+
+        <div class="col-12 md:col-6 lg:col-1 field">
+          <label for="edad" class="block">Edad</label>
+          <input
+            pInputText
+            id="edad"
+            formControlName="edad"
+            [min]="0"
+            [max]="120"
+            class="w-full"
+          />
+          @if (_helperService.getFormControlNgClass(frm, 'edad') &&
+          frm.controls['edad'].hasError('required')) {
+          <small class="text-red-500"> Edad es requerida </small>
+          }
+        </div>
+
+        <div class="col-12 md:col-6 lg:col-4 field">
+          <label for="correo" class="block">Correo</label>
+          <input
+            pInputText
+            id="correo"
+            formControlName="correo"
+            class="w-full"
+          />
+
+          @if (_helperService.getFormControlNgClass(frm, 'correo') &&
+          frm.controls['correo'].hasError('required')) {
+          <small class="text-red-500"> Correo es requerido </small>
+          }
+              @if (_helperService.getFormControlNgClass(frm, 'correo') &&
+          frm.controls['correo'].hasError('email')) {
+          <small class="text-red-500">Estructura de correo incorrecta (email&#64;email.com) </small>
+          }
+        </div>
+
+        <div class="col-12 md:col-6 lg:col-2 field">
+          <label for="telefono" class="block">Teléfono</label>
+          <input
+            pInputText
+            id="telefono"
+            formControlName="telefono"
+            class="w-full"
+          />
+          @if (_helperService.getFormControlNgClass(frm, 'telefono') &&
+          frm.controls['telefono'].hasError('required')) {
+          <small class="text-red-500"> Teléfono es requerido </small>
+          }
+         @if (_helperService.getFormControlNgClass(frm, 'telefono') &&
+          frm.controls['telefono'].hasError('minlength')) {
+          <small class="text-red-500">
+            Teléfono requiere mínimo de 6 números
+          </small>
+          } @if (_helperService.getFormControlNgClass(frm, 'telefono') &&
+          frm.controls['telefono'].hasError('maxlength')) {
+          <small class="text-red-500">
+            Teléfono requiere menos de 10 números
+          </small>}
+           @if ( _helperService.getFormControlNgClass(frm, 'telefono') &&
+          frm.controls['telefono'].hasError('pattern')) {
+          <small class="text-red-500"> Teléfono sólo permite números </small>
+          }
+        </div>
+
+        <div class="col-12 md:col-6 lg:col-3 field">
+          <label for="id_pais" class="block">País</label>
+          <p-select
+            id="id_pais"
+            [options]="optionsCountries"
+            optionLabel="name"
+            optionValue="value"
+            formControlName="id_pais"
+            placeholder="País"
+            showClear="true"
+            appendTo="body"
+            [filter]="true"
+            filterBy="name"
+            class="w-full"            
+          ></p-select>
+
+          @if (_helperService.getFormControlNgClass(frm, 'id_pais') &&
+          frm.controls['id_pais'].hasError('required')) {
+          <small class="text-red-500"> País es requerido </small>
+          }
+        </div>
+
+        <div class="col-12 md:col-6 lg:col-3 field">
+          <label for="ciudad" class="block">Ciudad</label>
+          <input
+            pInputText
+            id="ciudad"
+            formControlName="ciudad"
+            class="w-full"
+          />
+          @if (_helperService.getFormControlNgClass(frm, 'ciudad') &&
+          frm.controls['ciudad'].hasError('required')) {
+          <small class="text-red-500"> Ciudad es requerida </small>
+          }
+        </div>
+
+        <div class="col-12 field">
+          <label for="direccion" class="block">Dirección</label>
+          <input
+            pInputText
+            id="direccion"
+            formControlName="direccion"
+            class="w-full"
+          />
+          @if (_helperService.getFormControlNgClass(frm, 'direccion') &&
+          frm.controls['direccion'].hasError('required')) {
+          <small class="text-red-500"> Dirección es requerida </small>
+          }
+        </div>
+      </form>
+    </ng-template>
+
+    <ng-template #footer>
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        text
+        (click)="hideDialog()"
+        severity="danger"
+        [disabled]="loadingButtonSave"
+      />
+      <p-button label="Guadar" icon="pi pi-check" (click)="save()" [loading]="loadingButtonSave" />
+    </ng-template>
+  </p-dialog>
+
+  <p-confirmDialog
+    [breakpoints]="{ '960px': '75vw', '640px': '100vw' }"
+    [style]="{ width: '30vw' }"
+    [baseZIndex]="10000"
+    rejectButtonStyleClass="p-button-danger"
+  />
 </div>
