@@ -4,13 +4,13 @@ export class PersonModel {
   id_persona: number;
   nombre: string;
   apellido: string;
+  genero: string;
+  cedula: string;
   email: string;
   telefono: number;
-  genero: string;
   ciudad: string;
   edad: number;
   id_pais: number;  
-  cedula: string;
   pais: CountryDto
 
   constructor(

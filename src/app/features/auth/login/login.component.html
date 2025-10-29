@@ -1,1 +1,99 @@
-<p>login works!</p>
+<div class="flex justify-content-center align-items-center min-h-screen">
+    <p-toast />
+  <p-card class="w-full max-w-30rem shadow-3 border-round-3xl p-0">
+    <ng-template #header>
+      <div
+        class="flex flex-column justify-content-center align-items-center pr-5 pl-5 pt-5"
+      >
+        <i
+          class="pi pi-shop mb-2"
+          style="color: var(--p-button-primary-background); font-size: 3.5rem"
+        ></i>
+
+        <div class="text-900 text-3xl font-medium mb-2">¡Bienvenido!</div>
+        <span class="text-600 font-medium">Ingresa para continuar</span>
+      </div>
+    </ng-template>
+
+    <!-- Contenido card -->
+
+    <form [formGroup]="frm" class="p-5 pt-0"  autocomplete="off">
+      <div class="mb-4">
+        <label for="username" class="block text-900 font-medium mb-2"
+          >Usuario</label
+        >
+        <input
+          pInputText
+          id="username"
+          type="text"
+          formControlName="username"
+          placeholder="Usuario"
+          class="w-full"
+          [ngClass]="
+            _helperService.getFormControlNgClass(
+              frm,
+              'username',
+              'ng-invalid ng-dirty'
+            )
+          "
+        />
+        @if (_helperService.getFormControlNgClass(frm, 'username') &&
+        frm.controls['username'].hasError('required')) {
+        <small class="text-red-500 block">Usuario es requerido</small>
+        }
+      </div>
+
+      <div class="mb-4">
+        <label for="password" class="block text-900 font-medium mb-2"
+          >Password</label
+        >
+        <p-password
+          id="password"
+          formControlName="password"
+          placeholder="Password"
+          [toggleMask]="true"
+          [feedback]="false"
+          styleClass="w-full"
+          inputStyleClass="w-full"
+          [ngClass]="
+            _helperService.getFormControlNgClass(
+              frm,
+              'password',
+              'ng-invalid ng-dirty'
+            )
+          "
+        />
+        @if (_helperService.getFormControlNgClass(frm, 'password') &&
+        frm.controls['password'].hasError('required')) {
+        <small class="text-red-500 block"
+          >Contraseña es requerida</small>
+        }
+      </div>
+
+      <div
+        class="flex align-items-center justify-content-between flex-wrap gap-2"
+      >
+        <div class="flex align-items-center gap-2">
+          <p-checkbox
+            formControlName="rememberMe"
+            [binary]="true"
+            inputId="rememberMe"
+          />
+          <label for="rememberMe" class="text-900">Recordarme</label>
+        </div>
+        <a
+          class="font-medium no-underline text-green-400 cursor-pointer hover:text-green-700"
+          (click)="onForgotPassword()"
+        >
+          ¿Olvidaste tu contraseña?
+        </a>
+      </div>
+    </form>
+    <!-- fin contenido card-->
+    <ng-template #footer>
+      <div class="p-5">
+        <p-button label="Ingresar" class="w-full" styleClass="w-full" (click)="login()" />
+      </div>
+    </ng-template>
+  </p-card>
+</div>

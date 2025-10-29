@@ -1,11 +1,13 @@
 import { Routes } from '@angular/router';
 import { LayoutsComponent } from './core/layout/layout.component';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
     path: '',
     component: LayoutsComponent,
     children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
         loadComponent: () =>
@@ -13,6 +15,7 @@ export const routes: Routes = [
             (m) => m.DashboardComponent
           ),
         data: { breadcrumb: 'Dashboard' },
+        canActivate: [authGuard],
       },
       {
         path: 'customers',
@@ -21,8 +24,8 @@ export const routes: Routes = [
             (m) => m.CustomersComponent
           ),
         data: { breadcrumb: 'Clientes' },
+        canActivate: [authGuard],
       },
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'country',
         loadComponent: () =>
@@ -30,6 +33,7 @@ export const routes: Routes = [
             (m) => m.CountryComponent
           ),
         data: { breadcrumb: 'País' },
+        canActivate: [authGuard],
       },
       {
         path: 'category',
@@ -38,6 +42,7 @@ export const routes: Routes = [
             (m) => m.CategoryComponent
           ),
         data: { breadcrumb: 'Categoría' },
+        canActivate: [authGuard],
       },
       {
         path: 'user',
@@ -46,6 +51,7 @@ export const routes: Routes = [
             (m) => m.UserComponent
           ),
         data: { breadcrumb: 'Usuarios' },
+        canActivate: [authGuard],
       },
     ],
   },

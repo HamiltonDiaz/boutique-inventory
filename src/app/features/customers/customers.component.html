@@ -157,7 +157,7 @@
     [modal]="true"
   >
     <ng-template #content>
-      <form [formGroup]="frm" class="grid">
+      <form [formGroup]="frm" class="grid" autocomplete="off">
         <!--Estado Cédula y nombre  -->
         <div class="col-6 md:col-3 lg:col-1 field">
           <label for="activo" class="block">Estado</label>
@@ -182,21 +182,21 @@
 
           @if (_helperService.getFormControlNgClass(frm, 'cedula') &&
           frm.controls['cedula'].hasError('required')) {
-          <small class="text-red-500"> La cédula es requerida </small>
+          <small class="text-red-500 block"> La cédula es requerida </small>
           } 
           @if (_helperService.getFormControlNgClass(frm, 'cedula') &&
           frm.controls['cedula'].hasError('minlength')) {
-          <small class="text-red-500">
+          <small class="text-red-500 block">
             La cédula requiere mínimo de 6 números
           </small>
           } @if (_helperService.getFormControlNgClass(frm, 'cedula') &&
           frm.controls['cedula'].hasError('maxlength')) {
-          <small class="text-red-500">
+          <small class="text-red-500 block">
             La cédula requiere menos de 12 números
           </small>
           } @if ( _helperService.getFormControlNgClass(frm, 'cedula') &&
           frm.controls['cedula'].hasError('pattern')) {
-          <small class="text-red-500"> La cédula sólo permite números </small>
+          <small class="text-red-500 block"> La cédula sólo permite números </small>
           }
         </div>
 
@@ -210,7 +210,7 @@
           />
           @if (_helperService.getFormControlNgClass(frm, 'nombre') &&
           frm.controls['nombre'].hasError('required')) {
-          <small class="text-red-500"> Los nombres son requeridos </small>
+          <small class="text-red-500 block"> Los nombres son requeridos </small>
           }
         </div>
 
@@ -224,7 +224,7 @@
           />
           @if (_helperService.getFormControlNgClass(frm, 'apellido') &&
           frm.controls['apellido'].hasError('required')) {
-          <small class="text-red-500"> Los apellidos son requeridos </small>
+          <small class="text-red-500 block"> Los apellidos son requeridos </small>
           }
         </div>
 
@@ -249,7 +249,7 @@
           ></p-select>
           @if (_helperService.getFormControlNgClass(frm, 'apellido') &&
           frm.controls['apellido'].hasError('required')) {
-          <small class="text-red-500"> Género es requerido </small>
+          <small class="text-red-500 block"> Género es requerido </small>
           }
         </div>
 
@@ -265,7 +265,7 @@
           />
           @if (_helperService.getFormControlNgClass(frm, 'edad') &&
           frm.controls['edad'].hasError('required')) {
-          <small class="text-red-500"> Edad es requerida </small>
+          <small class="text-red-500 block"> Edad es requerida </small>
           }
         </div>
 
@@ -280,11 +280,11 @@
 
           @if (_helperService.getFormControlNgClass(frm, 'correo') &&
           frm.controls['correo'].hasError('required')) {
-          <small class="text-red-500"> Correo es requerido </small>
+          <small class="text-red-500 block"> Correo es requerido </small>
           }
               @if (_helperService.getFormControlNgClass(frm, 'correo') &&
           frm.controls['correo'].hasError('email')) {
-          <small class="text-red-500">Estructura de correo incorrecta (email&#64;email.com) </small>
+          <small class="text-red-500 block">Estructura de correo incorrecta (email&#64;email.com) </small>
           }
         </div>
 
@@ -298,21 +298,21 @@
           />
           @if (_helperService.getFormControlNgClass(frm, 'telefono') &&
           frm.controls['telefono'].hasError('required')) {
-          <small class="text-red-500"> Teléfono es requerido </small>
+          <small class="text-red-500 block"> Teléfono es requerido </small>
           }
          @if (_helperService.getFormControlNgClass(frm, 'telefono') &&
           frm.controls['telefono'].hasError('minlength')) {
-          <small class="text-red-500">
+          <small class="text-red-500 block">
             Teléfono requiere mínimo de 6 números
           </small>
           } @if (_helperService.getFormControlNgClass(frm, 'telefono') &&
           frm.controls['telefono'].hasError('maxlength')) {
-          <small class="text-red-500">
+          <small class="text-red-500 block">
             Teléfono requiere menos de 10 números
           </small>}
            @if ( _helperService.getFormControlNgClass(frm, 'telefono') &&
           frm.controls['telefono'].hasError('pattern')) {
-          <small class="text-red-500"> Teléfono sólo permite números </small>
+          <small class="text-red-500 block"> Teléfono sólo permite números </small>
           }
         </div>
 
@@ -334,7 +334,7 @@
 
           @if (_helperService.getFormControlNgClass(frm, 'id_pais') &&
           frm.controls['id_pais'].hasError('required')) {
-          <small class="text-red-500"> País es requerido </small>
+          <small class="text-red-500 block"> País es requerido </small>
           }
         </div>
 
@@ -348,7 +348,7 @@
           />
           @if (_helperService.getFormControlNgClass(frm, 'ciudad') &&
           frm.controls['ciudad'].hasError('required')) {
-          <small class="text-red-500"> Ciudad es requerida </small>
+          <small class="text-red-500 block"> Ciudad es requerida </small>
           }
         </div>
 
@@ -362,7 +362,7 @@
           />
           @if (_helperService.getFormControlNgClass(frm, 'direccion') &&
           frm.controls['direccion'].hasError('required')) {
-          <small class="text-red-500"> Dirección es requerida </small>
+          <small class="text-red-500 block"> Dirección es requerida </small>
           }
         </div>
       </form>

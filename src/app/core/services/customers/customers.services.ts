@@ -3,8 +3,8 @@ import { Observable } from 'rxjs';
 import { CustomersModel } from '../../models/customers/customers.model';
 import { CustomersRepository } from '../../repos/customers/customers.repository';
 import { ResponseModel } from '../../models/common/response.model';
-import { CreateCustomerDto } from '../../dtos/create-customer.dto';
-import { UpdateCustomerDto } from '../../dtos/update-customer.dto';
+import { CreateCustomerDto } from '../../dtos/customer/create-customer.dto';
+import { UpdateCustomerDto } from '../../dtos/customer/update-customer.dto';
 import { CustomersServiceInterface } from './customers.service.interface';
 
 @Injectable({ providedIn: 'root' })

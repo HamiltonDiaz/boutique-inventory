@@ -1,8 +1,8 @@
 import { Observable } from 'rxjs';
 import { ResponseModel } from '../../models/common/response.model';
 import { CustomersModel } from '../../models/customers/customers.model';
-import { CreateCustomerDto } from '../../dtos/create-customer.dto';
-import { UpdateCustomerDto } from '../../dtos/update-customer.dto';
+import { CreateCustomerDto } from '../../dtos/customer/create-customer.dto';
+import { UpdateCustomerDto } from '../../dtos/customer/update-customer.dto';
 
 export interface CustomersRepositoryInterface {
   findAll(): Observable<ResponseModel<CustomersModel[]>>;

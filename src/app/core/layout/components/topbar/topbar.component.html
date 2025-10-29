@@ -1,4 +1,6 @@
-<p-menubar [model]="items">
+<!-- <p-menubar [model]="items"/> -->
+ <p-toast />
+<p-menubar >
   <ng-template pTemplate="start">
     <button
       pButton
@@ -10,6 +12,7 @@
   </ng-template>
 
   <ng-template pTemplate="end">
-    <button pButton icon="pi pi-user" class="p-button-text">Perfil</button>
+    <button pButton icon="pi pi-user" class="p-button-text" (click)="menu.toggle($event)">Perfil</button>
+    <p-menu #menu [popup]="true" [model]="items"/>
   </ng-template>
 </p-menubar>

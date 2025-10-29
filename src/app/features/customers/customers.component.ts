@@ -26,16 +26,12 @@ import { CustomersModel } from '../../core/models/customers/customers.model';
 import { ICols } from '../../core/dtos/icos.dto';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { HelpersService } from '../../core/services/common/helper.service';
-import { CreateCustomerDto } from '../../core/dtos/create-customer.dto';
-import { UpdateCustomerDto } from '../../core/dtos/update-customer.dto';
+import { CreateCustomerDto } from '../../core/dtos/customer/create-customer.dto';
+import { UpdateCustomerDto } from '../../core/dtos/customer/update-customer.dto';
 import { ListElementDto } from '../../core/dtos/list-element.dto';
 import { CountryService } from '../../core/services/country/country.services';
 import { CountryModel } from '../../core/models/country/country.model';
 
-interface ExportColumn {
-  title: string;
-  dataKey: string;
-}
 @Component({
   selector: 'app-customers',
   imports: [
@@ -47,8 +43,7 @@ interface ExportColumn {
     ConfirmDialog,
     InputTextModule,
     TextareaModule,
-    CommonModule,
-    InputTextModule,
+    CommonModule,    
     IconFieldModule,
     InputIconModule,
     ButtonModule,
@@ -184,9 +179,6 @@ export class CustomersComponent implements OnInit {
   }));
   }
 
-  exportCSV(event?: Event) {
-    this.table_custom.exportCSV();
-  }
 
   hideDialog(): void {
     this.createEditDialog = false;
@@ -274,22 +266,21 @@ export class CustomersComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'No se pudo crear el registro: ' + error.message,
+          detail: 'No se pudo crear el registro: ',
           life: 3000,
         });
       });
       if (response?.status == 200) {
         this.messageService.add({
           severity: 'success',
-          summary: 'Exitoso',
+          summary: 'Mensaje del sistema',
           detail: 'Registro creado exitosamente',
           life: 3000,
         });
       }
     }
 
-    if (!this.createRegister) {
-      console.log('ID a actualizar:', data);
+    if (!this.createRegister) {      
       const response = await lastValueFrom(
         this._customersService.update(this.idRegisterToEdit,data)
       ).catch((error) => {
