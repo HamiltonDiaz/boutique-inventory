@@ -1,0 +1,14 @@
+export enum RoutesEnum {
+  DASHBOARD = 'dashboard',
+  CUSTOMERS = 'customers',
+  COUNTRY = 'country',
+  CATEGORY = 'category',
+  USER = 'user',
+  COLOR = 'color',
+  PURCHASE = 'purchase',
+  SALES = 'sales',
+  SUPPLIER = 'supplier',
+  AUTH = 'auth',
+  PRODUCTS = 'products',
+  SIZE='size'
+}
