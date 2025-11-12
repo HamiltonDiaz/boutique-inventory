@@ -6,9 +6,10 @@ import { CountryRepositoryInterface } from './country.repository.interface'
 import { environment } from '../../../../enviroments/enviroment.dev'
 
 import { ResponseModel } from '../../models/common/response.model'
-// import { CreateCustomerDto } from '../../dtos/create-customer.dto'
-// import { UpdateCustomerDto } from '../../dtos/update-customer.dto'
 import { CountryModel } from '../../models/country/country.model'
+import { CreateCountryDto } from '../../dtos/country/create-country.dto'
+import { UpdateCountryDto } from '../../dtos/country/update-country.dto'
+
 
 @Injectable({ providedIn: 'root' })
 export class CountryRepository implements CountryRepositoryInterface {
@@ -23,34 +24,34 @@ export class CountryRepository implements CountryRepositoryInterface {
     )
   }
 
-  // findById(id: string): Observable<ResponseModel<CountryModel>> {
-  //   return this._httpClient.get<ResponseModel<CountryModel>>(
-  //     `${this.API_URL}${id}`
-  //   )
-  // }
+  findById(id: number): Observable<ResponseModel<CountryModel>> {
+    return this._httpClient.get<ResponseModel<CountryModel>>(
+      `${this.API_URL}${id}`
+    )
+  }
 
-  // create(
-  //   data: CreateCustomerDto
-  // ): Observable<ResponseModel<CountryModel>> {
-  //   return this._httpClient.post<ResponseModel<CountryModel>>(
-  //     `${this.API_URL}`,
-  //     data
-  //   )
-  // }
+  create(
+    data: CreateCountryDto
+  ): Observable<ResponseModel<CountryModel>> {
+    return this._httpClient.post<ResponseModel<CountryModel>>(
+      `${this.API_URL}`,
+      data
+    )
+  }
 
 
-  // update(id: string, data: UpdateCustomerDto): Observable<ResponseModel<boolean>> {
-  //   return this._httpClient.patch<ResponseModel<boolean>>(
-  //     `${this.API_URL}${id}`,
-  //     data
-  //   )
-  // }
+  update(id: number, data: UpdateCountryDto): Observable<ResponseModel<boolean>> {
+    return this._httpClient.patch<ResponseModel<boolean>>(
+      `${this.API_URL}${id}`,
+      data
+    )
+  }
 
-  // delete(id: string): Observable<ResponseModel<boolean>> {
-  //   return this._httpClient.delete<ResponseModel<boolean>>(
-  //     `${this.API_URL}${id}`
-  //   )
-  // }
+  delete(id: number): Observable<ResponseModel<boolean>> {
+    return this._httpClient.delete<ResponseModel<boolean>>(
+      `${this.API_URL}${id}`
+    )
+  }
 
 
 }

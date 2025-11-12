@@ -152,6 +152,7 @@
     [style]="{ width: '75vw' }"
     [header]="titleDialog"
     [modal]="true"
+    (onHide)="clearForm()"
   >
     <ng-template #content>
       <form [formGroup]="frm" class="grid" autocomplete="off">

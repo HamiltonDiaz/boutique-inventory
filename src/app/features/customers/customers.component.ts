@@ -270,7 +270,7 @@ export class CustomersComponent implements OnInit {
           life: 3000,
         });
       });
-      if (response?.status == 200) {
+      if (response?.status == 200 || response?.status == 201 ){
         this.messageService.add({
           severity: 'success',
           summary: 'Mensaje del sistema',

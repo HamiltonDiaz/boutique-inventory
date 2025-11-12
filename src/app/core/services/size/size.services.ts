@@ -18,7 +18,7 @@ export class SizeService implements SizeServiceInterface {
   findAll(): Observable<ResponseModel<SizeModel[]>> {
     return this.repository.findAll();
   }
-  findById(id: string): Observable<ResponseModel<SizeModel>> {
+  findById(id: number): Observable<ResponseModel<SizeModel>> {
     return this.repository.findById(id);
   }
 
@@ -26,11 +26,11 @@ export class SizeService implements SizeServiceInterface {
     return this.repository.create(data);
   }
 
-  update(id: string,data: UpdateSizeDto): Observable<ResponseModel<boolean>> {
+  update(id: number,data: UpdateSizeDto): Observable<ResponseModel<boolean>> {
     return this.repository.update(id, data);
   }
 
-  delete(id: string): Observable<ResponseModel<boolean>> {
+  delete(id: number): Observable<ResponseModel<boolean>> {
     return this.repository.delete(id);
   }
 }

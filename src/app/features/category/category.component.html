@@ -138,6 +138,7 @@
     [style]="{ width: '50vw' }"
     [header]="titleDialog"
     [modal]="true"
+    (onHide)="clearForm()"
   >
     <ng-template #content>
       <form [formGroup]="frm" class="grid" autocomplete="off">
@@ -193,7 +194,7 @@
             />
             @if (_helperService.getFormControlNgClass(frm, 'descripcion') &&
             frm.controls['descripcion'].hasError('required')) {
-            <small class="text-red-500"> Avatar es requerido </small>
+            <small class="text-red-500"> Descripción es requerida </small>
             }        
         </div>
       </form>

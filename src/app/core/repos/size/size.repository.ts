@@ -12,7 +12,7 @@ import { UpdateSizeDto } from '../../dtos/size/update-size.dto'
 
 @Injectable({ providedIn: 'root' })
 export class SizeRepository implements SizeRepositoryInterface {
-  API_URL = `${environment.url}Size/`
+  API_URL = `${environment.url}talla/`
 
   constructor(private _httpClient: HttpClient) {}
   
@@ -23,7 +23,7 @@ export class SizeRepository implements SizeRepositoryInterface {
     )
   }
 
-  findById(id: string): Observable<ResponseModel<SizeModel>> {
+  findById(id: number): Observable<ResponseModel<SizeModel>> {
     return this._httpClient.get<ResponseModel<SizeModel>>(
       `${this.API_URL}${id}`
     )
@@ -39,14 +39,14 @@ export class SizeRepository implements SizeRepositoryInterface {
   }
 
 
-  update(id: string, data: UpdateSizeDto): Observable<ResponseModel<boolean>> {
+  update(id: number, data: UpdateSizeDto): Observable<ResponseModel<boolean>> {
     return this._httpClient.patch<ResponseModel<boolean>>(
       `${this.API_URL}${id}`,
       data
     )
   }
 
-  delete(id: string): Observable<ResponseModel<boolean>> {
+  delete(id: number): Observable<ResponseModel<boolean>> {
     return this._httpClient.delete<ResponseModel<boolean>>(
       `${this.API_URL}${id}`
     )

@@ -16,7 +16,7 @@ export class ProductService implements ProductServiceInterface {
   findAll(): Observable<ResponseModel<ProductModel[]>> {
     return this.repository.findAll();
   }
-  findById(id: string): Observable<ResponseModel<ProductModel>> {
+  findById(id: number): Observable<ResponseModel<ProductModel>> {
     return this.repository.findById(id);
   }
 
@@ -24,11 +24,11 @@ export class ProductService implements ProductServiceInterface {
     return this.repository.create(data);
   }
 
-  update(id: string,data: UpdateProductDto): Observable<ResponseModel<boolean>> {
+  update(id: number,data: UpdateProductDto): Observable<ResponseModel<boolean>> {
     return this.repository.update(id, data);
   }
 
-  delete(id: string): Observable<ResponseModel<boolean>> {
+  delete(id: number): Observable<ResponseModel<boolean>> {
     return this.repository.delete(id);
   }
 }

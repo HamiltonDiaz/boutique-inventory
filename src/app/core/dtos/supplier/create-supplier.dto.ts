@@ -1,4 +1,11 @@
+import { PersonDto } from '../person.dto';
+
 export interface CreateSupplierDto {
-  nombre: string;
-  descripcion: string;
+  proveedor: SupplierDto;
+  persona: PersonDto;
+}
+
+export interface SupplierDto {
+  razon_social: string;
+  marca: boolean;
 }

@@ -1,8 +1,7 @@
 export class SizeModel {
   constructor(
-    public id_categoria: string,
-    public nombre: string,
-    public descripcion: string
+    public id_talla: number,
+    public talla: string,    
   ) {
   }
 }

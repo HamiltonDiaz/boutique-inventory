@@ -155,6 +155,7 @@
     [style]="{ width: '75vw' }"
     [header]="titleDialog"
     [modal]="true"
+    (onHide)="clearForm()"
   >
     <ng-template #content>
       <form [formGroup]="frm" class="grid" autocomplete="off">
@@ -247,8 +248,8 @@
             filterBy="name"
             class="w-full"
           ></p-select>
-          @if (_helperService.getFormControlNgClass(frm, 'apellido') &&
-          frm.controls['apellido'].hasError('required')) {
+          @if (_helperService.getFormControlNgClass(frm, 'genero') &&
+          frm.controls['genero'].hasError('required')) {
           <small class="text-red-500 block"> Género es requerido </small>
           }
         </div>

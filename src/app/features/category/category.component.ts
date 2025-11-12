@@ -20,15 +20,11 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { Table } from 'primeng/table';
 import { SelectModule } from 'primeng/select';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { PasswordModule } from 'primeng/password';
 import { lastValueFrom } from 'rxjs';
 import { ICols } from '../../core/dtos/icos.dto';
 import { HelpersService } from '../../core/services/common/helper.service';
 import { ListElementDto } from '../../core/dtos/list-element.dto';
-import { UserService } from '../../core/services/user/user.services';
-import { CountryService } from '../../core/services/country/country.services';
-import { CountryModel } from '../../core/models/country/country.model';
+
 
 import { CategoryService } from '../../core/services/category/category.services';
 import { CategoryModel } from '../../core/models/category/category.model';
@@ -37,6 +33,7 @@ import { CreateCategoryDto } from '../../core/dtos/category/create-category.dto'
 
 @Component({
   selector: 'app-category',
+  standalone: true,
   imports: [
     TableModule,
     Dialog,
@@ -52,9 +49,7 @@ import { CreateCategoryDto } from '../../core/dtos/category/create-category.dto'
     InputIconModule,
     ButtonModule,
     FormsModule,
-    ReactiveFormsModule,
-    ToggleSwitchModule,
-    PasswordModule,
+    ReactiveFormsModule,    
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './category.component.html',
@@ -75,7 +70,7 @@ export class CategoryComponent implements OnInit{
   columns: ICols[] = [
     {
       field: 'nombre',
-      header: 'Nómbre',
+      header: 'Nombre',
       order: true,
       filterable: true,
       class: 'text-left w-10rem',

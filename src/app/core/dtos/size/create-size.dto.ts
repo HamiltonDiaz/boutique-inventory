@@ -1,4 +1,4 @@
 export interface CreateSizeDto {
-  nombre: string;
-  descripcion: string;
+  id_talla: number;
+  talla: string;  
 }

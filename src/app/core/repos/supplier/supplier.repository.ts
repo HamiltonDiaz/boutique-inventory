@@ -13,7 +13,7 @@ import { UpdateSupplierDto } from '../../dtos/supplier/update-supplier.dto'
 
 @Injectable({ providedIn: 'root' })
 export class SupplierRepository implements SupplierRepositoryInterface {
-  API_URL = `${environment.url}Supplier/`
+  API_URL = `${environment.url}proveedor/`
 
   constructor(private _httpClient: HttpClient) {}
   
@@ -24,7 +24,7 @@ export class SupplierRepository implements SupplierRepositoryInterface {
     )
   }
 
-  findById(id: string): Observable<ResponseModel<SupplierModel>> {
+  findById(id: number): Observable<ResponseModel<SupplierModel>> {
     return this._httpClient.get<ResponseModel<SupplierModel>>(
       `${this.API_URL}${id}`
     )
@@ -40,14 +40,14 @@ export class SupplierRepository implements SupplierRepositoryInterface {
   }
 
 
-  update(id: string, data: UpdateSupplierDto): Observable<ResponseModel<boolean>> {
+  update(id: number, data: UpdateSupplierDto): Observable<ResponseModel<boolean>> {
     return this._httpClient.patch<ResponseModel<boolean>>(
       `${this.API_URL}${id}`,
       data
     )
   }
 
-  delete(id: string): Observable<ResponseModel<boolean>> {
+  delete(id: number): Observable<ResponseModel<boolean>> {
     return this._httpClient.delete<ResponseModel<boolean>>(
       `${this.API_URL}${id}`
     )

@@ -7,8 +7,8 @@ import { UpdateProductDto } from "../../dtos/product/update-product.dto";
 
 export interface ProductServiceInterface {
   findAll(): Observable<ResponseModel<ProductModel[]>>;
-  findById(id: string): Observable<ResponseModel<ProductModel>>;
+  findById(id: number): Observable<ResponseModel<ProductModel>>;
   create(data: CreateProductDto): Observable<ResponseModel<ProductModel>>;
-  update(id: string, data: UpdateProductDto): Observable<ResponseModel<boolean>>;
-  delete(id: string): Observable<ResponseModel<boolean>>;
+  update(id: number, data: UpdateProductDto): Observable<ResponseModel<boolean>>;
+  delete(id: number): Observable<ResponseModel<boolean>>;
 }

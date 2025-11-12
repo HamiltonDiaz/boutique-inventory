@@ -18,7 +18,7 @@ export class SupplierService implements SupplierServiceInterface {
   findAll(): Observable<ResponseModel<SupplierModel[]>> {
     return this.repository.findAll();
   }
-  findById(id: string): Observable<ResponseModel<SupplierModel>> {
+  findById(id: number): Observable<ResponseModel<SupplierModel>> {
     return this.repository.findById(id);
   }
 
@@ -26,11 +26,11 @@ export class SupplierService implements SupplierServiceInterface {
     return this.repository.create(data);
   }
 
-  update(id: string,data: UpdateSupplierDto): Observable<ResponseModel<boolean>> {
+  update(id: number,data: UpdateSupplierDto): Observable<ResponseModel<boolean>> {
     return this.repository.update(id, data);
   }
 
-  delete(id: string): Observable<ResponseModel<boolean>> {
+  delete(id: number): Observable<ResponseModel<boolean>> {
     return this.repository.delete(id);
   }
 }

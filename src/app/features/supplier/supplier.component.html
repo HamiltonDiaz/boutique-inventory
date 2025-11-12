@@ -1,1 +1,405 @@
-<p>supplier works!</p>
+<div class="card">
+  <p-toast />
+
+  <!-- NUEVO HEADER -->
+
+  <p-toolbar styleClass="mb-2">
+    <ng-template #start>
+      <p-button
+        label="Nuevo"
+        icon="pi pi-plus"
+        class="mr-2"
+        (onClick)="openModalNew()"
+      />
+      <p-button
+        severity="danger"
+        label="Borrar"
+        icon="pi pi-trash"
+        outlined
+        (onClick)="deleteAllRegisters()"
+        [disabled]="!selectedCustomers || !selectedCustomers.length"
+      />
+    </ng-template>
+
+    <ng-template #end>
+      <p-button
+        label="Export"
+        icon="pi pi-upload"
+        severity="secondary"
+        (onClick)="exportDataCSV($event)"
+      />
+    </ng-template>
+  </p-toolbar>
+
+  <!-- FIN NUEVO HEADER -->
+
+  <!-- NUEVA TABLA -->
+
+  <p-table
+    #table_custom
+    [value]="customersTable"
+    [rows]="10"
+    [columns]="columns"
+    [paginator]="true"
+    [globalFilterFields]="getFilterFields()"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [(selection)]="selectedCustomers"
+    [rowHover]="true"
+    dataKey="id_cliente"
+    currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+    [showCurrentPageReport]="true"
+    [scrollable]="true"
+    scrollHeight="300px"
+    [rowsPerPageOptions]="[10, 25, 50]"
+  >
+    <ng-template #caption>
+      <div class="flex items-center justify-between">
+        <h5 class="m-0">Clientes</h5>
+        <p-iconfield>
+          <p-inputicon styleClass="pi pi-search" />
+          <input
+            pInputText
+            type="text"
+            (input)="
+              table_custom?.filterGlobal($any($event.target).value, 'contains')
+            "
+            placeholder="Buscar..."
+          />
+        </p-iconfield>
+      </div>
+    </ng-template>
+    <ng-template #header>
+      <tr>
+        <th style="width: 3rem">
+          <p-tableHeaderCheckbox />
+        </th>
+
+        <ng-container *ngFor="let col of columns">
+          <th
+            *ngIf="col.field != 'actions'"
+            [ngStyle]="{ 'min-width': col.minWidth }"
+            [ngClass]="col.class"
+            [pSortableColumn]="col.order ? col.field : undefined"
+          >
+            {{ col.header }}
+            <p-sortIcon
+              *ngIf="col.order"
+              class="float-right"
+              [field]="col.field"
+            ></p-sortIcon>
+          </th>
+
+          <th *ngIf="col.field == 'actions'" [ngClass]="col.class">
+            {{ col.header }}
+          </th>
+        </ng-container>
+      </tr>
+    </ng-template>
+    <ng-template #body let-item>
+      <tr>
+        <td style="width: 3rem">
+          <p-tableCheckbox [value]="item" />
+        </td>
+        <td>
+          {{ item.persona.cedula }}
+        </td>
+        <td>
+          {{item.razon_social | uppercase}}
+        </td>
+        <td class="text-center">{{ item.marca }}</td>
+        
+        <td class="text-center">
+          <p-button
+            icon="pi pi-pencil"
+            class="mr-2"
+            [rounded]="true"
+            [outlined]="true"
+            (click)="editRegister(item)"
+            size="small"
+          />
+          <p-button
+            icon="pi pi-trash"
+            severity="danger"
+            [rounded]="true"
+            [outlined]="true"
+            (click)="deleteRegister(item)"
+            size="small"
+          />
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="columns.length + 1">
+          <div class="pt-2 pb-2 text-center">No se encontraron registros.</div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+  <!-- FIN NUEVA TABLA -->
+
+  <!-- MODAL CLIENTES -->
+  <p-dialog
+    [(visible)]="createEditDialog"
+    [style]="{ width: '75vw' }"
+    [header]="titleDialog"
+    [modal]="true"
+    (onHide)="clearForm()"
+  >
+    <ng-template #content>
+      <form [formGroup]="frm" class="grid" autocomplete="off">
+        <!-- Marca  -->
+        <div class="col-6 md:col-6 lg:col-4 field">
+          <label for="marca" class="block">Marca</label>
+          <input
+            pInputText
+            id="marca"
+            formControlName="marca"
+            class="w-full"
+            [ngClass]="
+              _helperService.getFormControlNgClass(
+                frm,
+                'marca',
+                'ng-invalid ng-dirty'
+              )
+            "
+          />
+          @if (_helperService.getFormControlNgClass(frm, 'marca') &&
+          frm.controls['marca'].hasError('required')) {
+          <small class="text-red-500 block"> Marca es requerida </small>
+          }
+        </div>
+
+        <div class="col-8 field">
+          <label for="razon_social" class="block">Razón social</label>
+          <input
+            pInputText
+            id="razon_social"
+            formControlName="razon_social"
+            class="w-full"
+          />
+          @if (_helperService.getFormControlNgClass(frm, 'razon_social') &&
+          frm.controls['razon_social'].hasError('required')) {
+          <small class="text-red-500 block"> Razón social es requerida </small>
+          }
+        </div>
+
+        <div class="col-12 md:col-9 lg:col-2 field">
+          <label for="cedula" class="block">Cédula</label>
+          <input
+            pInputText
+            id="cedula"
+            formControlName="cedula"
+            class="w-full"
+            [ngClass]="
+              _helperService.getFormControlNgClass(
+                frm,
+                'cedula',
+                'ng-invalid ng-dirty'
+              )
+            "
+          />
+
+          @if (_helperService.getFormControlNgClass(frm, 'cedula') &&
+          frm.controls['cedula'].hasError('required')) {
+          <small class="text-red-500 block"> La cédula es requerida </small>
+          } @if (_helperService.getFormControlNgClass(frm, 'cedula') &&
+          frm.controls['cedula'].hasError('minlength')) {
+          <small class="text-red-500 block">
+            La cédula requiere mínimo de 6 números
+          </small>
+          } @if (_helperService.getFormControlNgClass(frm, 'cedula') &&
+          frm.controls['cedula'].hasError('maxlength')) {
+          <small class="text-red-500 block">
+            La cédula requiere menos de 12 números
+          </small>
+          } @if ( _helperService.getFormControlNgClass(frm, 'cedula') &&
+          frm.controls['cedula'].hasError('pattern')) {
+          <small class="text-red-500 block">
+            La cédula sólo permite números
+          </small>
+          }
+        </div>
+
+        <div class="col-12 md:col-6 lg:col-3 field">
+          <label for="nombre" class="block">Nombres</label>
+          <input
+            pInputText
+            id="nombre"
+            formControlName="nombre"
+            class="w-full"
+          />
+          @if (_helperService.getFormControlNgClass(frm, 'nombre') &&
+          frm.controls['nombre'].hasError('required')) {
+          <small class="text-red-500 block"> Los nombres son requeridos </small>
+          }
+        </div>
+
+        <div class="col-12 md:col-6 lg:col-3 field">
+          <label for="apellido" class="block">Apellidos</label>
+          <input
+            pInputText
+            id="apellido"
+            formControlName="apellido"
+            class="w-full"
+          />
+          @if (_helperService.getFormControlNgClass(frm, 'apellido') &&
+          frm.controls['apellido'].hasError('required')) {
+          <small class="text-red-500 block">
+            Los apellidos son requeridos
+          </small>
+          }
+        </div>
+
+        <!-- Género y Edad -->
+        <div class="col-12 md:col-6 lg:col-2 field">
+          <label for="genero" class="block">Género</label>
+          <p-select
+            id="genero"
+            [options]="[
+              { name: 'Masculino', value: 'M' },
+              { name: 'Femenino', value: 'F' }
+            ]"
+            optionLabel="name"
+            optionValue="value"
+            formControlName="genero"
+            placeholder="Género"
+            showClear="true"
+            appendTo="body"
+            [filter]="true"
+            filterBy="name"
+            class="w-full"
+          ></p-select>
+          @if (_helperService.getFormControlNgClass(frm, 'genero') &&
+          frm.controls['genero'].hasError('required')) {
+          <small class="text-red-500 block"> Género es requerido </small>
+          }
+        </div>
+
+        <div class="col-12 md:col-6 lg:col-1 field">
+          <label for="edad" class="block">Edad</label>
+          <input
+            pInputText
+            id="edad"
+            formControlName="edad"
+            [min]="0"
+            [max]="120"
+            class="w-full"
+          />
+          @if (_helperService.getFormControlNgClass(frm, 'edad') &&
+          frm.controls['edad'].hasError('required')) {
+          <small class="text-red-500 block"> Edad es requerida </small>
+          }
+        </div>
+
+        <div class="col-12 md:col-6 lg:col-4 field">
+          <label for="correo" class="block">Correo</label>
+          <input
+            pInputText
+            id="correo"
+            formControlName="correo"
+            class="w-full"
+          />
+
+          @if (_helperService.getFormControlNgClass(frm, 'correo') &&
+          frm.controls['correo'].hasError('required')) {
+          <small class="text-red-500 block"> Correo es requerido </small>
+          } @if (_helperService.getFormControlNgClass(frm, 'correo') &&
+          frm.controls['correo'].hasError('email')) {
+          <small class="text-red-500 block"
+            >Estructura de correo incorrecta (email&#64;email.com)
+          </small>
+          }
+        </div>
+
+        <div class="col-12 md:col-6 lg:col-2 field">
+          <label for="telefono" class="block">Teléfono</label>
+          <input
+            pInputText
+            id="telefono"
+            formControlName="telefono"
+            class="w-full"
+          />
+          @if (_helperService.getFormControlNgClass(frm, 'telefono') &&
+          frm.controls['telefono'].hasError('required')) {
+          <small class="text-red-500 block"> Teléfono es requerido </small>
+          } @if (_helperService.getFormControlNgClass(frm, 'telefono') &&
+          frm.controls['telefono'].hasError('minlength')) {
+          <small class="text-red-500 block">
+            Teléfono requiere mínimo de 6 números
+          </small>
+          } @if (_helperService.getFormControlNgClass(frm, 'telefono') &&
+          frm.controls['telefono'].hasError('maxlength')) {
+          <small class="text-red-500 block">
+            Teléfono requiere menos de 10 números </small
+          >} @if ( _helperService.getFormControlNgClass(frm, 'telefono') &&
+          frm.controls['telefono'].hasError('pattern')) {
+          <small class="text-red-500 block">
+            Teléfono sólo permite números
+          </small>
+          }
+        </div>
+
+        <div class="col-12 md:col-6 lg:col-3 field">
+          <label for="id_pais" class="block">País</label>
+          <p-select
+            id="id_pais"
+            [options]="optionsCountries"
+            optionLabel="name"
+            optionValue="value"
+            formControlName="id_pais"
+            placeholder="País"
+            showClear="true"
+            appendTo="body"
+            [filter]="true"
+            filterBy="name"
+            class="w-full"
+          ></p-select>
+
+          @if (_helperService.getFormControlNgClass(frm, 'id_pais') &&
+          frm.controls['id_pais'].hasError('required')) {
+          <small class="text-red-500 block"> País es requerido </small>
+          }
+        </div>
+
+        <div class="col-12 md:col-6 lg:col-3 field">
+          <label for="ciudad" class="block">Ciudad</label>
+          <input
+            pInputText
+            id="ciudad"
+            formControlName="ciudad"
+            class="w-full"
+          />
+          @if (_helperService.getFormControlNgClass(frm, 'ciudad') &&
+          frm.controls['ciudad'].hasError('required')) {
+          <small class="text-red-500 block"> Ciudad es requerida </small>
+          }
+        </div>
+      </form>
+    </ng-template>
+
+    <ng-template #footer>
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        text
+        (click)="hideDialog()"
+        severity="danger"
+        [disabled]="loadingButtonSave"
+      />
+      <p-button
+        label="Guadar"
+        icon="pi pi-check"
+        (click)="save()"
+        [loading]="loadingButtonSave"
+      />
+    </ng-template>
+  </p-dialog>
+
+  <p-confirmDialog
+    [breakpoints]="{ '960px': '75vw', '640px': '100vw' }"
+    [style]="{ width: '30vw' }"
+    [baseZIndex]="10000"
+    rejectButtonStyleClass="p-button-danger"
+  />
+</div>

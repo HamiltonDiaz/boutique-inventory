@@ -1,11 +1,11 @@
 import { PersonDto } from "../person.dto"
 
 export interface CreateCustomerDto {
-  cliente: CategoryDto
+  cliente: ClientDto
   persona: PersonDto
 }
 
-export interface CategoryDto {
+export interface ClientDto {
   direccion: string
   activo: boolean
 }

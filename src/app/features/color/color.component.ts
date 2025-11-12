@@ -1,11 +1,284 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { TableModule } from 'primeng/table';
+import { Dialog } from 'primeng/dialog';
+import { ButtonModule } from 'primeng/button';
+import { ToastModule } from 'primeng/toast';
+import { ToolbarModule } from 'primeng/toolbar';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { Table } from 'primeng/table';
+import { SelectModule } from 'primeng/select';
+import { lastValueFrom } from 'rxjs';
+import { ICols } from '../../core/dtos/icos.dto';
+
+//Componentes propios - generales
+import { HelpersService } from '../../core/services/common/helper.service';
+import { ListElementDto } from '../../core/dtos/list-element.dto';
+
+//Componentes propios -específicos
+import { ColorModel } from '../../core/models/color/color.model';
+import { ColorService } from '../../core/services/color/color.services';
+import { CreateColorDto } from '../../core/dtos/color/create-color.dto';
+import { UpdateColorDto } from '../../core/dtos/color/update-color.dto';
 
 @Component({
   selector: 'app-color',
-  imports: [],
+  standalone: true,
+  imports: [
+    TableModule,
+    Dialog,
+    SelectModule,
+    ToastModule,
+    ToolbarModule,
+    ConfirmDialog,
+    InputTextModule,
+    TextareaModule,
+    CommonModule,
+    InputTextModule,
+    IconFieldModule,
+    InputIconModule,
+    ButtonModule,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
   templateUrl: './color.component.html',
-  styleUrl: './color.component.scss'
+  styleUrl: './color.component.scss',
+  providers: [MessageService, ConfirmationService],
 })
-export class ColorComponent {
 
+export class ColorComponent implements OnInit {
+  @ViewChild('table_custom') table_custom!: Table;
+  componentTitle: string = 'Colores';
+  dataForTable: ColorModel[] = [];
+  selectedCustomers!: ColorModel[] | null;
+  public frm!: FormGroup;
+  createRegister: boolean = true;
+  createEditDialog: boolean = false;
+  titleDialog: string = '';
+  loadingButtonSave: boolean = false;
+  idRegisterToEdit: string = '';
+  optionsCountries: ListElementDto[] = [];
+  columns: ICols[] = [
+    {
+      field: 'id_color',
+      header: 'id',
+      order: true,
+      filterable: true,
+      class: 'text-left w-10rem',
+      minWidth: '10rem',
+    },
+    {
+      field: 'color',
+      header: 'Nombre',
+      order: true,
+      filterable: true,
+      class: 'text-left w-10rem',
+      minWidth: '10rem',
+    },
+    {
+      field: 'actions',
+      header: 'Acciones',
+      class: 'text-center w-10rem',
+      minWidth: '10rem',
+      order: false,
+      filterable: true,
+    },
+  ];
+
+  constructor(
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService,
+    private _colorService: ColorService,
+    private readonly formBuilder: FormBuilder,
+    readonly _helperService: HelpersService
+  ) {}
+
+  async ngOnInit() {
+    this.loadForm();
+    await this.loadDataForTable();
+  }
+
+  loadForm(): void {
+    this.frm = this.formBuilder.group({
+      color: [
+        { value: null, disabled: false },
+        Validators.compose([Validators.required]),
+      ]
+    });
+  }
+
+  hideDialog(): void {
+    this.createEditDialog = false;
+    this.createRegister = true;
+  }
+
+  async loadDataForTable(): Promise<void> {
+    const response = await lastValueFrom(this._colorService.findAll());
+    if (response.status !== 200) {
+      console.error('Error al cargar los registros:', response.message);
+      return;
+    }
+    this.dataForTable = response.data;
+  }
+
+  /**
+   * Obtiene las claves de campo que permiten filtrado en la tabla.
+   *
+   * @returns Array de cadenas con los nombres de campo en `cols` donde `filterable === true`.
+   */
+  getFilterFields(): string[] {
+    return this.columns.filter((col) => col.filterable).map((col) => col.field);
+  }
+
+  openModalNew() {
+    this.createRegister = true;
+    this.titleDialog = 'Crear nuevo registro';
+    this.idRegisterToEdit = '';
+    this.createEditDialog = true;
+  }
+
+  buildDataToSave(): CreateColorDto | UpdateColorDto {
+    const formValues = this.frm.getRawValue();
+    return {
+      id_color: this.idRegisterToEdit,
+      color: formValues.color,
+      
+    };
+  }
+
+  buildDataToUpdate(item: ColorModel): void {
+    this.frm.controls['color'].setValue(item.color);    
+  }
+
+  async save() {
+    if (this.frm.invalid) {
+      this.frm.markAllAsTouched();
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Mensaje del sistema.',
+        detail: 'Llenar todos los campos obligatorios',
+        life: 3000,
+      });
+      return;
+    }
+    this.loadingButtonSave = true;
+    const data: CreateColorDto | UpdateColorDto = this.buildDataToSave();
+
+    if (this.createRegister) {
+      const response = await lastValueFrom(
+        this._colorService.create(data)
+      ).catch((error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo crear el registro: ' + error.message,
+          life: 3000,
+        });
+      });
+      if (response?.status == 200 || response?.status == 201) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Mensaje del sistema',
+          detail: 'Registro creado exitosamente',
+          life: 3000,
+        });
+      }
+    }
+
+    if (!this.createRegister) {
+      const response = await lastValueFrom(
+        this._colorService.update(this.idRegisterToEdit, data)
+      ).catch((error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo actualizar el registro: ' + error.message,
+          life: 3000,
+        });
+      });
+      if (response?.status == 200 || response?.status == 201) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Mensaje del sistema',
+          detail: 'Registro actualizado exitosamente',
+          life: 3000,
+        });
+      }
+    }
+
+    this.loadingButtonSave = false;
+    await this.loadDataForTable();
+    this.clearForm();
+    this.hideDialog();
+  }
+
+  clearForm() {
+    this.frm.reset();
+  }
+
+  editRegister(item: ColorModel) {
+    this.idRegisterToEdit = item.id_color;
+    this.titleDialog = 'Editar registro';
+    this.createRegister = false;
+    this.createEditDialog = true;
+    this.buildDataToUpdate(item);
+  }
+
+  deleteRegister(item: ColorModel) {
+    this.confirmationService.confirm({
+      message:
+        '¿Estás seguro de que deseas eliminar el registo ' +
+        `${item.color}`.toUpperCase().trim() +
+        '?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      accept: async () => {
+        const response = await lastValueFrom(
+          this._colorService.delete(item.id_color)
+        ).catch((error) => {
+          console.error('Error al eliminar el registro:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudo eliminar el registro',
+            life: 3000,
+          });
+        });
+        if (response?.status == 200) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Exitoso',
+            detail: 'Registro eliminado',
+            life: 3000,
+          });
+        }
+        await this.loadDataForTable();
+      },
+    });
+  }
+
+  deleteAllRegisters() {
+    this.confirmationService.confirm({
+      message:
+        '¿Estás seguro de que deseas eliminar los registros seleccionados?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {},
+    });
+  }
+  exportDataCSV(event?: Event) {
+    this.table_custom.exportCSV();
+  }
 }

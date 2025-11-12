@@ -1,4 +1,5 @@
 export interface UpdateColorDto {
-  nombre: string;
-  descripcion: string;
+  id_color: string;
+  color: string;
+  
 }

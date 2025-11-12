@@ -12,20 +12,20 @@ import { UpdateProductDto } from '../../dtos/product/update-product.dto'
 
 @Injectable({ providedIn: 'root' })
 export class ProductRepository implements ProductRepositoryInterface {
-  API_URL = `${environment.url}categoria/`
+  API_URL = `${environment.url}`
 
   constructor(private _httpClient: HttpClient) {}
   
   findAll(    
   ): Observable<ResponseModel<ProductModel[]>> {
     return this._httpClient.get<ResponseModel<ProductModel[]>>(
-      `${this.API_URL}`
+      `${this.API_URL}producto/`
     )
   }
 
-  findById(id: string): Observable<ResponseModel<ProductModel>> {
+  findById(id: number): Observable<ResponseModel<ProductModel>> {
     return this._httpClient.get<ResponseModel<ProductModel>>(
-      `${this.API_URL}${id}`
+      `${this.API_URL}producto/${id}`
     )
   }
 
@@ -33,22 +33,22 @@ export class ProductRepository implements ProductRepositoryInterface {
     data: CreateProductDto
   ): Observable<ResponseModel<ProductModel>> {
     return this._httpClient.post<ResponseModel<ProductModel>>(
-      `${this.API_URL}`,
+      `${this.API_URL}producto/`,
       data
     )
   }
 
 
-  update(id: string, data: UpdateProductDto): Observable<ResponseModel<boolean>> {
+  update(id: number, data: UpdateProductDto): Observable<ResponseModel<boolean>> {
     return this._httpClient.patch<ResponseModel<boolean>>(
-      `${this.API_URL}${id}`,
+      `${this.API_URL}producto/${id}`,
       data
     )
   }
 
-  delete(id: string): Observable<ResponseModel<boolean>> {
+  delete(id: number): Observable<ResponseModel<boolean>> {
     return this._httpClient.delete<ResponseModel<boolean>>(
-      `${this.API_URL}${id}`
+      `${this.API_URL}producto/${id}`
     )
   }
 
