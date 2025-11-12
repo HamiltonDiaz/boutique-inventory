@@ -63,8 +63,20 @@ export class SidebarComponent {
         },
         {
           label: 'Productos',
-          icon: 'pi pi-truck',
-          routerLink: [RoutesEnum.PRODUCTS],
+          icon: 'pi pi-plus',
+          items: [
+            {
+              label: 'Productos',
+              icon: 'pi pi-truck',
+              routerLink: [RoutesEnum.PRODUCTS],
+            },
+            {
+              label: 'Producto completo',
+              icon: 'pi pi-list',
+              routerLink: [RoutesEnum.FULL_PRODUCTS],
+            },
+          ]
+          
         },
         {
           label: 'Compras',

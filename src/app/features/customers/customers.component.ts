@@ -59,6 +59,7 @@ export class CustomersComponent implements OnInit {
   @ViewChild('table_custom') table_custom!: Table;
   customersTable: CustomersModel[] = [];
   selectedCustomers!: CustomersModel[] | null;
+  componentTitle: string = 'Clientes';
   public frm!: FormGroup;
   createRegister: boolean = true;
   createEditDialog: boolean = false;

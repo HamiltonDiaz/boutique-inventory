@@ -8,7 +8,7 @@ export const routes: Routes = [
     path: '',
     component: LayoutsComponent,
     children: [
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: '', redirectTo: RoutesEnum.DASHBOARD, pathMatch: 'full' },
       {
         path: RoutesEnum.DASHBOARD,
         loadComponent: () =>
@@ -50,7 +50,7 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/user/user.component').then((m) => m.UserComponent),
         data: { breadcrumb: 'Usuarios' },
-        canActivate: [authGuard],
+        // canActivate: [authGuard],//TODO: Activar cuando ya se implemente el login
       },
       {
         path: RoutesEnum.COLOR,
@@ -102,6 +102,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/size/size.component').then((m) => m.SizeComponent),
         data: { breadcrumb: 'Tallas' },
+        canActivate: [authGuard],
+      },
+            {
+        path: RoutesEnum.FULL_PRODUCTS,
+        loadComponent: () =>
+          import('./features/full-product/full-product.component').then((m) => m.FullProductComponent),
+        data: { breadcrumb: 'Productos completos' },
         canActivate: [authGuard],
       },
     ],

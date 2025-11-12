@@ -8,9 +8,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { TooltipModule } from 'primeng/tooltip';
-import { AvatarModule } from 'primeng/avatar';
-
+import { MessageModule } from 'primeng/message';
+import { lastValueFrom } from 'rxjs';
 import { TableModule } from 'primeng/table';
 import { Dialog } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
@@ -22,77 +21,83 @@ import { TextareaModule } from 'primeng/textarea';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { Table } from 'primeng/table';
-import { SelectModule } from 'primeng/select';
+import {
+  FileSelectEvent,
+  FileUpload,
+  FileUploadModule,
+} from 'primeng/fileupload';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { PasswordModule } from 'primeng/password';
-import { lastValueFrom } from 'rxjs';
+import { SelectModule } from 'primeng/select';
+import { ImageModule } from 'primeng/image';
+
 import { ICols } from '../../core/dtos/icos.dto';
+import { SizeService } from '../../core/services/size/size.services';
+import { ColorService } from '../../core/services/color/color.services';
 import { HelpersService } from '../../core/services/common/helper.service';
 import { ListElementDto } from '../../core/dtos/list-element.dto';
-import { UserService } from '../../core/services/user/user.services';
-import { CountryService } from '../../core/services/country/country.services';
-import { CountryModel } from '../../core/models/country/country.model';
-import { CreateUserDto } from '../../core/dtos/user/create-user.dto';
-import { UpdateUserDto } from '../../core/dtos/user/update-user.dto';
-import { UsersModel } from '../../core/models/user/users.model';
-import { MessageModule } from 'primeng/message';
-import { FileSelectEvent, FileUploadModule } from 'primeng/fileupload';
+import { SizeModel } from '../../core/models/size/size.model';
+import { ColorModel } from '../../core/models/color/color.model';
+import { FullProductModel } from '../../core/models/product/full-product.model';
+import { CreateFullProductDto } from '../../core/dtos/product/create-full-product.dto';
+import { UpdateFullProductDto } from '../../core/dtos/product/update-full-product.dto';
+import { FullProductService } from '../../core/services/product/full-product.services';
+import { ProductService } from '../../core/services/product/product.services';
+import { ProductModel } from '../../core/models/product/product.model';
 
 @Component({
-  selector: 'app-user',
+  selector: 'app-full-product',
+  standalone: true,
   imports: [
+    CommonModule,
+    FileUploadModule,
+    ToggleSwitchModule,
+    SelectModule,
+    FormsModule,
+    ReactiveFormsModule,
     TableModule,
     Dialog,
-    SelectModule,
+    ButtonModule,
     ToastModule,
     ToolbarModule,
     ConfirmDialog,
     InputTextModule,
     TextareaModule,
-    CommonModule,
-    InputTextModule,
     IconFieldModule,
     InputIconModule,
     ButtonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    ToggleSwitchModule,
-    PasswordModule,
     MessageModule,
-    FileUploadModule,
-    TooltipModule,
-    AvatarModule
+    ImageModule,
   ],
+  templateUrl: './full-product.component.html',
+  styleUrl: './full-product.component.scss',
   providers: [MessageService, ConfirmationService],
-  templateUrl: './user.component.html',
-  styleUrl: './user.component.scss',
 })
-export class UserComponent implements OnInit {
+export class FullProductComponent implements OnInit {
   @ViewChild('table_custom') table_custom!: Table;
-  componentTitle: string = 'Usuarios';
-  dataForTable: UsersModel[] = [];
-  selectedCustomers!: UsersModel[] | null;
+  componentTitle: string = 'Productos completos';
+  @ViewChild('foto') foto!: FileUpload;
+  selectedFile?: File;
+  imagePreviewUrl: string | null = null;
+
   public frm!: FormGroup;
+  sizesList: ListElementDto[] = [];
+  colorsList: ListElementDto[] = [];
+  productList: ListElementDto[] = [];
+
+  dataForTable: FullProductModel[] = [];
+  selectedRegister!: FullProductModel[] | null;
+
   createRegister: boolean = true;
   createEditDialog: boolean = false;
   titleDialog: string = '';
   loadingButtonSave: boolean = false;
-  idRegisterToEdit: string = '';
-  optionsCountries: ListElementDto[] = [];
-  selectedFile?: File;
+  idRegisterToEdit: number = 0;
+  categoriesList: ListElementDto[] = [];
   alertImageVisible: boolean = false;
-  imagePreviewUrl: string | null = null;
+
   columns: ICols[] = [
     {
-      field: 'persona.cedula',
-      header: 'Cédula',
-      order: true,
-      filterable: true,
-      class: 'text-left w-10rem',
-      minWidth: '10rem',
-    },
-    {
-      field: 'persona.nombre',
+      field: 'producto.nombre',
       header: 'Nombre',
       order: true,
       filterable: true,
@@ -100,29 +105,37 @@ export class UserComponent implements OnInit {
       minWidth: '10rem',
     },
     {
-      field: 'persona.email',
-      header: 'Email',
+      field: 'talla.talla',
+      header: 'Talla',
       order: true,
       filterable: true,
-      class: 'text-left w-10rem',
-      minWidth: '10rem',
+      class: 'text-left w-5rem',
+      minWidth: '5rem',
     },
     {
-      field: 'username',
-      header: 'Usuario',
+      field: 'color.color',
+      header: 'Color',
+      class: ' w-5rem',
+      minWidth: '8rem',
       order: true,
       filterable: true,
-      class: 'text-left w-10rem',
-      minWidth: '10rem',
     },
     {
-      field: 'activo',
-      header: 'Activo',
+      field: 'precio',
+      header: 'Precio',
       class: 'text-center w-5rem',
       minWidth: '8rem',
       order: true,
       filterable: true,
     },
+    {
+      field: 'activo',
+      header: 'Activo',
+      class: ' w-5rem',
+      minWidth: '8rem',
+      order: true,
+      filterable: true,
+    },    
     {
       field: 'actions',
       header: 'Acciones',
@@ -136,93 +149,95 @@ export class UserComponent implements OnInit {
   constructor(
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private _userService: UserService,
-    private _countryService: CountryService,
+    private _fullProductService: FullProductService,
+    private _productService: ProductService,
+    private _sizeService: SizeService,
+    private _colorService: ColorService,
     private readonly formBuilder: FormBuilder,
     readonly _helperService: HelpersService
   ) {}
 
   async ngOnInit() {
-    this.loadForm();
-    await this.loadCountriesOptions();
+    await this.loadSizes();
+    await this.loadColors();
+    await this.loadProducts();
     await this.loadDataForTable();
+    this.loadForm();
   }
 
   loadForm(): void {
     this.frm = this.formBuilder.group({
-      username: [
+      id_talla: [{ value: null, disabled: false }, Validators.required],
+      id_producto: [{ value: null, disabled: true }, Validators.required],
+      id_color: [{ value: null, disabled: false }, Validators.required],
+      precio: [
         { value: null, disabled: false },
         Validators.compose([
           Validators.required,
-          Validators.maxLength(20),
-          Validators.minLength(6),
+          Validators.pattern('^[0-9]+(\\.[0-9]+)?$'),
         ]),
       ],
-      password: [
+      cantidad: [
         { value: null, disabled: false },
         Validators.compose([
           Validators.required,
-          Validators.maxLength(20),
-          Validators.minLength(6),
+          Validators.pattern('^[0-9]*$'),
         ]),
       ],
-      avatar: [{ value: null, disabled: false }],
       activo: [{ value: true, disabled: false }],
-      cedula: [
-        { value: null, disabled: false },
-        Validators.compose([
-          Validators.required,
-          Validators.maxLength(12),
-          Validators.minLength(6),
-          Validators.pattern('^[0-9]*$'),
-        ]),
-      ],
-      nombre: [{ value: null, disabled: false }, Validators.required],
-      apellido: [{ value: null, disabled: false }, Validators.required],
-      correo: [
-        { value: null, disabled: false },
-        Validators.compose([Validators.required, Validators.email]),
-      ],
-      telefono: [
-        { value: null, disabled: false },
-        Validators.compose([
-          Validators.required,
-          Validators.maxLength(10),
-          Validators.minLength(6),
-          Validators.pattern('^[0-9]*$'),
-        ]),
-      ],
-      genero: [{ value: null, disabled: false }, Validators.required],
-      ciudad: [{ value: null, disabled: false }, Validators.required],
-      edad: [{ value: null, disabled: false }, Validators.required],
-      id_pais: [{ value: null, disabled: false }, Validators.required],
+      foto: [{ value: null, disabled: false }],
     });
   }
 
-  async loadCountriesOptions(): Promise<void> {
-    const response = await lastValueFrom(this._countryService.findAll());
-    if (response.status !== 200 && response.status !== 204) {
-      console.error('Error al cargar los países:', response.message);
+  async loadSizes() {
+    const response = await lastValueFrom(this._sizeService.findAll());
+    if (response.status !== 200) {
+      console.error('Error al cargar tallas:', response.message);
       return;
     }
-    this.optionsCountries = response.data.map((country: CountryModel) => ({
-      value: country.id_pais,
-      name: country.nombre,
+    this.sizesList = response.data.map((item: SizeModel) => ({
+      value: item.id_talla,
+      name: item.talla,
     }));
   }
-  hideDialog(): void {
-    this.createEditDialog = false;
-    this.createRegister = true;
-    this.clearForm();
+
+  async loadColors() {
+    const response = await lastValueFrom(this._colorService.findAll());
+    if (response.status !== 200) {
+      console.error('Error al cargar tallas:', response.message);
+      return;
+    }
+    this.colorsList = response.data.map((item: ColorModel) => ({
+      value: item.id_color,
+      name: item.color,
+    }));
+  }
+
+  async loadProducts() {
+    const response = await lastValueFrom(this._productService.findAll());
+    if (response.status !== 200) {
+      console.error('Error al cargar productos:', response.message);
+      return;
+    }
+    this.productList = response.data.map((item: ProductModel) => ({
+      value: item.id_producto,
+      name: item.nombre,
+    }));
   }
 
   async loadDataForTable(): Promise<void> {
-    const response = await lastValueFrom(this._userService.findAll());
+    const response = await lastValueFrom(this._fullProductService.findAll());
     if (response.status !== 200) {
-      console.error('Error al cargar los registros:', response.message);
+      console.error('Error al cargar los clientes:', response.message);
       return;
     }
     this.dataForTable = response.data;
+  }
+  hideDialog(): void {
+    this.frm.get('id_producto')?.disable();    
+    this.createEditDialog = false;
+    this.createRegister = true;
+    this.clearForm();
   }
 
   /**
@@ -235,74 +250,53 @@ export class UserComponent implements OnInit {
   }
 
   openModalNew() {
+    this.frm.get('id_producto')?.enable();
     this.createRegister = true;
     this.titleDialog = 'Crear nuevo registro';
-    this.idRegisterToEdit = '';
+    this.idRegisterToEdit = 0;
     this.createEditDialog = true;
   }
 
-  buildDataToSave(): CreateUserDto | UpdateUserDto {
+  buildDataToSave(): CreateFullProductDto | UpdateFullProductDto {
     const formValues = this.frm.getRawValue();
     return {
-      usuario: {
-        usuario: formValues.username,
-        password: formValues.password,
-        avatar: formValues.avatar,
-        activo: formValues.activo,
-      },
-      persona: {
-        cedula: formValues.cedula,
-        nombre: formValues.nombre,
-        apellido: formValues.apellido,
-        correo: formValues.correo,
-        telefono: formValues.telefono,
-        genero: formValues.genero,
-        ciudad: formValues.ciudad,
-        edad: formValues.edad,
-        id_pais: formValues.id_pais,
-      },
+      id_pxc: this.idRegisterToEdit,
+      id_producto: formValues.id_producto,
+      id_talla: formValues.id_talla,
+      id_color: formValues.id_color,
+      precio: formValues.precio,
+      foto: formValues.foto,
+      cantidad: formValues.cantidad,
+      activo: formValues.activo,
     };
   }
 
-  buildDataToUpdate(item: UsersModel): void {
-    this.frm.controls['username'].setValue(item.username);
-    this.frm.controls['password'].setValue('');
-    this.frm.controls['avatar'].setValue(item.avatar);
+  buildDataToUpdate(item: FullProductModel): void {
+    this.frm.controls['id_producto'].setValue(item.id_producto);
+    this.frm.controls['id_talla'].setValue(item.id_talla);
+    this.frm.controls['id_color'].setValue(item.id_color);
+    this.frm.controls['precio'].setValue(item.precio);
+    this.frm.controls['foto'].setValue(item.foto);
+    this.frm.controls['cantidad'].setValue(item.cantidad);
     this.frm.controls['activo'].setValue(item.activo);
-    this.frm.controls['cedula'].setValue(item.persona.cedula);
-    this.frm.controls['nombre'].setValue(item.persona.nombre);
-    this.frm.controls['apellido'].setValue(item.persona.apellido);
-    this.frm.controls['correo'].setValue(item.persona.email);
-    this.frm.controls['telefono'].setValue(item.persona.telefono);
-    this.frm.controls['genero'].setValue(item.persona.genero);
-    this.frm.controls['ciudad'].setValue(item.persona.ciudad);
-    this.frm.controls['edad'].setValue(item.persona.edad);
-    this.frm.controls['id_pais'].setValue(item.persona.pais.id_pais);
   }
 
-  createFormdata(data: CreateUserDto | UpdateUserDto): FormData {
+  createFormdata(data: CreateFullProductDto | UpdateFullProductDto): FormData {
     const formData = new FormData();
-    formData.append('usuario[username]', data.usuario.usuario);
-    formData.append('usuario[password]', data.usuario.password);
-    formData.append('avatar', this.selectedFile!); //Archivo
-    formData.append('usuario[activo]', data.usuario.activo.toString());
-    formData.append('persona[cedula]', data.persona.cedula);
-    formData.append('persona[nombre]', data.persona.nombre);
-    formData.append('persona[apellido]', data.persona.apellido);
-    formData.append('persona[correo]', data.persona.correo);
-    formData.append('persona[telefono]', data.persona.telefono.toString());
-    formData.append('persona[genero]', data.persona.genero);
-    formData.append('persona[ciudad]', data.persona.ciudad);
-    formData.append('persona[edad]', data.persona.edad.toString());
-    formData.append('persona[id_pais]', data.persona.id_pais.toString() );
+    formData.append('foto', this.selectedFile!);
+    formData.append('id_pxc', data.id_pxc.toString());
+    formData.append('id_producto', data.id_producto.toString());
+    formData.append('id_talla', data.id_talla.toString());
+    formData.append('id_color', data.id_color.toString());
+    formData.append('precio', data.precio.toString());
+    formData.append('cantidad', data.cantidad.toString());
+    formData.append('activo', data.activo.toString());
     return formData;
   }
 
   async save() {
     this.alertImageVisible =
-      this.selectedFile == null &&
-      (this.frm.controls['avatar'].value === '' ||
-        this.frm.controls['avatar'].value == null);
+      this.selectedFile == null && (this.frm.controls['foto'].value === '' || this.frm.controls['foto'].value == null);
 
     if (this.frm.invalid || this.alertImageVisible) {
       this.frm.markAllAsTouched();
@@ -316,19 +310,20 @@ export class UserComponent implements OnInit {
     }
 
     this.alertImageVisible = false;
-
     this.loadingButtonSave = true;
-    const data: CreateUserDto | UpdateUserDto = this.buildDataToSave();
+    const data: CreateFullProductDto | UpdateFullProductDto =
+      this.buildDataToSave();
+
     const formData = this.createFormdata(data);
 
     if (this.createRegister) {
       const response = await lastValueFrom(
-        this._userService.create(formData)
+        this._fullProductService.create(formData)
       ).catch((error) => {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'No se pudo crear el registro: ' + error.message,
+          detail: 'No se pudo crear el registro: ',
           life: 3000,
         });
       });
@@ -344,7 +339,7 @@ export class UserComponent implements OnInit {
 
     if (!this.createRegister) {
       const response = await lastValueFrom(
-        this._userService.update(this.idRegisterToEdit, formData)
+        this._fullProductService.update(this.idRegisterToEdit, formData)
       ).catch((error) => {
         this.messageService.add({
           severity: 'error',
@@ -353,10 +348,10 @@ export class UserComponent implements OnInit {
           life: 3000,
         });
       });
-      if (response?.status == 200 || response?.status == 201) {
+      if (response?.status == 200) {
         this.messageService.add({
           severity: 'success',
-          summary: 'Mensaje del sistema',
+          summary: 'Exitoso',
           detail: 'Registro actualizado exitosamente',
           life: 3000,
         });
@@ -372,30 +367,34 @@ export class UserComponent implements OnInit {
   clearForm() {
     this.frm.reset();
     this.frm.controls['activo'].setValue(true);
+    this.idRegisterToEdit = 0;
     this.alertImageVisible = false;
     this.imagePreviewUrl = null;
     this.selectedFile = undefined;
+    if (this.foto) {
+      this.foto.clear();
+    }
   }
 
-  editRegister(item: UsersModel) {
-    this.idRegisterToEdit = item.id_usuario;
+  editRegister(item: FullProductModel) {
+    this.idRegisterToEdit = item.id_producto;
     this.titleDialog = 'Editar registro';
     this.createRegister = false;
     this.createEditDialog = true;
     this.buildDataToUpdate(item);
   }
 
-  deleteRegister(item: UsersModel) {
+  deleteRegister(item: FullProductModel) {
     this.confirmationService.confirm({
       message:
         '¿Estás seguro de que deseas eliminar el registo ' +
-        `${item.persona.nombre} ${item.persona.apellido}`.toUpperCase().trim() +
+        `${item.producto.nombre}`.toUpperCase().trim() +
         '?',
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
         const response = await lastValueFrom(
-          this._userService.delete(item.id_usuario)
+          this._fullProductService.delete(item.id_producto)
         ).catch((error) => {
           console.error('Error al eliminar el registro:', error);
           this.messageService.add({
@@ -448,6 +447,12 @@ export class UserComponent implements OnInit {
 
   get currentImageUrl(): string | null {
     // Prioridad: imagen nueva > imagen del servidor > null
-    return this.imagePreviewUrl || this.frm?.controls['avatar'].value || null;
+    return this.imagePreviewUrl || this.frm?.controls['foto'].value || null;
+  }
+
+  get dialogStyle() {
+    return this.currentImageUrl
+      ? { width: '75vw' }
+      : { width: '75vw', height: '55vh' };
   }
 }

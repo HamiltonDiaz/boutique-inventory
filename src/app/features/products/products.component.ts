@@ -8,6 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { lastValueFrom } from 'rxjs';
 import { TableModule } from 'primeng/table';
 import { Dialog } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
@@ -20,8 +21,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { Table } from 'primeng/table';
 import { SelectModule } from 'primeng/select';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { lastValueFrom } from 'rxjs';
+
 import { ICols } from '../../core/dtos/icos.dto';
 import { HelpersService } from '../../core/services/common/helper.service';
 import { ListElementDto } from '../../core/dtos/list-element.dto';
@@ -31,6 +31,7 @@ import { CreateProductDto } from '../../core/dtos/product/create-product.dto';
 import { UpdateProductDto } from '../../core/dtos/product/update-product.dto';
 import { CategoryService } from '../../core/services/category/category.services';
 import { CategoryModel } from '../../core/models/category/category.model';
+
 
 
 @Component({
@@ -45,51 +46,53 @@ import { CategoryModel } from '../../core/models/category/category.model';
     ConfirmDialog,
     InputTextModule,
     TextareaModule,
-    CommonModule,
-    InputTextModule,
+    CommonModule,    
     IconFieldModule,
     InputIconModule,
     ButtonModule,
     FormsModule,
     ReactiveFormsModule,
-    ToggleSwitchModule,
-  ],
+],
   templateUrl: './products.component.html',
   styleUrl: './products.component.scss',
   providers: [MessageService, ConfirmationService],
 })
 export class ProductsComponent implements OnInit {
+
   @ViewChild('table_custom') table_custom!: Table;
+  componentTitle: string = 'Productos';
   customersTable: ProductModel[] = [];
   selectedCustomers!: ProductModel[] | null;
   public frm!: FormGroup;
+  
   createRegister: boolean = true;
   createEditDialog: boolean = false;
   titleDialog: string = '';
   loadingButtonSave: boolean = false;
   idRegisterToEdit: number = 0;
-  categories: ListElementDto[] = [];
+  categoriesList: ListElementDto[] = [];
+  advancedTabDisabled: boolean = true;
 
   columns: ICols[] = [
     {
-      field: 'persona.instrucciones_de_cuidado',
-      header: 'Identificación',
+      field: 'nombre',
+      header: 'Nombre',
       order: true,
       filterable: true,
       class: 'text-left w-10rem',
       minWidth: '10rem',
     },
     {
-      field: 'razon_social',
-      header: 'Razón social',
+      field: 'categoria.nombre',
+      header: 'Categoría',
       order: true,
       filterable: true,
       class: 'text-left w-10rem',
       minWidth: '10rem',
     },
     {
-      field: 'marca',
-      header: 'Marca',
+      field: 'cantidad_stock',
+      header: 'Cantidad',
       class: 'text-center w-5rem',
       minWidth: '8rem',
       order: true,
@@ -116,8 +119,8 @@ export class ProductsComponent implements OnInit {
 
   async ngOnInit() {
     this.loadForm();
-    await this.loadDatForTable();
-    await this.loadCategories();
+    await this.loadcategoriesList();
+    await this.loadDataForTable();
   }
 
   loadForm(): void {
@@ -128,7 +131,8 @@ export class ProductsComponent implements OnInit {
         { value: null, disabled: false },
         Validators.required,
       ],
-      cantidad_stock: [{ value: null, disabled: false }, 
+      cantidad_stock: [
+        { value: null, disabled: false },
         Validators.compose([
           Validators.required,
           Validators.pattern('^[0-9]*$'),
@@ -136,28 +140,28 @@ export class ProductsComponent implements OnInit {
       ],
       id_categoria: [{ value: null, disabled: false }, Validators.required],
     });
+
+
   }
 
-  async loadCategories(): Promise<void> {
+  async loadcategoriesList(): Promise<void> {
     const response = await lastValueFrom(this._categoryService.findAll());
-    
+
     if (response.status !== 200) {
-      console.error('Error al cargar los clientes:', response.message);
+      console.error('Error al cargar categorias:', response.message);
       return;
     }
 
-     this.categories = response.data.map((item: CategoryModel) => ({
-          value: item.id_categoria,
-          name: item.nombre
-      }));
+    this.categoriesList = response.data.map((item: CategoryModel) => ({
+      value: item.id_categoria,
+      name: item.nombre,
+    }));
   }
 
-  hideDialog(): void {
-    this.createEditDialog = false;
-    this.createRegister = true;
-  }
+ 
 
-  async loadDatForTable(): Promise<void> {
+
+  async loadDataForTable(): Promise<void> {
     const response = await lastValueFrom(this._productService.findAll());
     if (response.status !== 200) {
       console.error('Error al cargar los clientes:', response.message);
@@ -165,6 +169,11 @@ export class ProductsComponent implements OnInit {
     }
     this.customersTable = response.data;
   }
+  hideDialog(): void {
+    this.createEditDialog = false;
+    this.createRegister = true;
+  }
+
 
   /**
    * Obtiene las claves de campo que permiten filtrado en la tabla.
@@ -229,7 +238,7 @@ export class ProductsComponent implements OnInit {
           life: 3000,
         });
       });
-      if (response?.status == 200 || response?.status == 201 ){
+      if (response?.status == 200 || response?.status == 201) {
         this.messageService.add({
           severity: 'success',
           summary: 'Mensaje del sistema',
@@ -261,17 +270,25 @@ export class ProductsComponent implements OnInit {
     }
 
     this.loadingButtonSave = false;
-    await this.loadDatForTable();
+    await this.loadDataForTable();
     this.clearForm();
     this.hideDialog();
   }
 
   clearForm() {
     this.frm.reset();
+    this.idRegisterToEdit = 0;
+    this.advancedTabDisabled = true;    
+
   }
 
   editRegister(item: ProductModel) {
     this.idRegisterToEdit = item.id_producto;
+
+    if (item.id_producto > 0) {
+      this.advancedTabDisabled = false;
+    }
+
     this.titleDialog = 'Editar registro';
     this.createRegister = false;
     this.createEditDialog = true;
@@ -306,7 +323,7 @@ export class ProductsComponent implements OnInit {
             life: 3000,
           });
         }
-        await this.loadDatForTable();
+        await this.loadDataForTable();
       },
     });
   }

@@ -1,5 +1,5 @@
 export interface UserDto {
-    username: string
+    usuario: string
     password: string
     avatar: string
     activo: boolean

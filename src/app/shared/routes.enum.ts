@@ -10,5 +10,6 @@ export enum RoutesEnum {
   SUPPLIER = 'supplier',
   AUTH = 'auth',
   PRODUCTS = 'products',
-  SIZE='size'
+  SIZE='size',
+  FULL_PRODUCTS = 'full-products',
 }

@@ -8,7 +8,7 @@ import { CreateUserDto } from '../../dtos/user/create-user.dto';
 export interface UserRepositoryInterface {
   findAll(): Observable<ResponseModel<UsersModel[]>>;  
   findById(id: string): Observable<ResponseModel<UsersModel>>;
-  create(data: CreateUserDto): Observable<ResponseModel<UsersModel>>;
-  update(id: string, data: UpdateUserDto): Observable<ResponseModel<boolean>>;
+  create(data: FormData | CreateUserDto): Observable<ResponseModel<UsersModel>>;
+  update(id: string, data: FormData |  UpdateUserDto): Observable<ResponseModel<boolean>>;
   delete(id: string): Observable<ResponseModel<boolean>>;
 }

@@ -58,6 +58,7 @@ import { UpdateSupplierDto } from '../../core/dtos/supplier/update-supplier.dto'
 })
 export class SupplierComponent implements OnInit {
   @ViewChild('table_custom') table_custom!: Table;
+  componentTitle: string = 'Proveedores';
   customersTable: SupplierModel[] = [];
   selectedCustomers!: SupplierModel[] | null;
   public frm!: FormGroup;

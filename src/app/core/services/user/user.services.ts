@@ -23,11 +23,11 @@ export class UserService implements UserServiceInterface {
     return this.repository.findById(id);
   }
 
-  create(data: CreateUserDto): Observable<ResponseModel<UsersModel>> {
+  create(data: FormData | CreateUserDto): Observable<ResponseModel<UsersModel>> {
     return this.repository.create(data);
   }
 
-  update(id: string,data: UpdateUserDto): Observable<ResponseModel<boolean>> {
+  update(id: string,data: FormData | UpdateUserDto): Observable<ResponseModel<boolean>> {
     return this.repository.update(id, data);
   }
 

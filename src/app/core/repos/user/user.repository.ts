@@ -30,7 +30,7 @@ export class UserRepository implements UserRepositoryInterface {
   }
 
   create(
-    data: CreateUserDto
+    data: FormData | CreateUserDto
   ): Observable<ResponseModel<UsersModel>> {
     return this._httpClient.post<ResponseModel<UsersModel>>(
       `${this.API_URL}`,
@@ -39,7 +39,7 @@ export class UserRepository implements UserRepositoryInterface {
   }
 
 
-  update(id: string, data: UpdateUserDto): Observable<ResponseModel<boolean>> {
+  update(id: string, data: FormData | UpdateUserDto): Observable<ResponseModel<boolean>> {
     return this._httpClient.patch<ResponseModel<boolean>>(
       `${this.API_URL}${id}`,
       data

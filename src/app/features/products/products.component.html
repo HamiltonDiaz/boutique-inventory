@@ -54,7 +54,7 @@
   >
     <ng-template #caption>
       <div class="flex items-center justify-between">
-        <h5 class="m-0">Clientes</h5>
+        <h5 class="m-0">{{componentTitle}}</h5>
         <p-iconfield>
           <p-inputicon styleClass="pi pi-search" />
           <input
@@ -101,12 +101,12 @@
           <p-tableCheckbox [value]="item" />
         </td>
         <td>
-          {{ item.nombre }}
+          {{ item.nombre | uppercase }}
         </td>
         <td>
-          {{ item.descripcion | uppercase }}
+          {{ item.categoria.nombre | uppercase }}
         </td>
-        <td class="text-center">{{ item.nombre }}</td>
+        <td class="text-center">{{ item.cantidad_stock }}</td>
 
         <td class="text-center">
           <p-button
@@ -147,114 +147,131 @@
     (onHide)="clearForm()"
   >
     <ng-template #content>
-      <form [formGroup]="frm" class="grid" autocomplete="off">
-        <!-- nombre  -->
-        <div class="col-12 md:col-6 lg:col-4 field">
-          <label for="nombre" class="block">Nombre</label>
-          <input
-            pInputText
-            id="nombre"
-            formControlName="nombre"
-            class="w-full"
-            [ngClass]="
-              _helperService.getFormControlNgClass(
-                frm,
-                'nombre',
-                'ng-invalid ng-dirty'
-              )
-            "
-          />
-          @if (_helperService.getFormControlNgClass(frm, 'nombre') &&
-          frm.controls['nombre'].hasError('required')) {
-          <small class="text-red-500 block"> Nombre es requerido </small>
-          }
-        </div>
 
-        <!-- Categoria -->
-        <div class="col-12 md:col-6 lg:col-3 field">
-          <label for="id_categoria" class="block">Categoría</label>
-          <p-select
-            id="id_categoria"
-            [options]="categories"
-            optionLabel="name"
-            optionValue="value"
-            formControlName="id_categoria"
-            placeholder="Categoria"
-            showClear="true"
-            appendTo="body"
-            [filter]="true"
-            filterBy="name"
-            class="w-full"
-          ></p-select>
+            <form [formGroup]="frm" class="grid" autocomplete="off">
+              <!-- nombre  -->
+              <div class="col-12 md:col-6 lg:col-4 field">
+                <label for="nombre" class="block">Nombre</label>
+                <input
+                  pInputText
+                  id="nombre"
+                  formControlName="nombre"
+                  class="w-full"
+                  [ngClass]="
+                    _helperService.getFormControlNgClass(
+                      frm,
+                      'nombre',
+                      'ng-invalid ng-dirty'
+                    )
+                  "
+                />
+                @if (_helperService.getFormControlNgClass(frm, 'nombre') &&
+                frm.controls['nombre'].hasError('required')) {
+                <small class="text-red-500 block"> Nombre es requerido </small>
+                }
+              </div>
 
-          @if (_helperService.getFormControlNgClass(frm, 'id_categoria') &&
-          frm.controls['id_categoria'].hasError('required')) {
-          <small class="text-red-500 block"> Categoría es requerida </small>
-          }
-        </div>
+              <!-- Categoria -->
+              <div class="col-12 md:col-6 lg:col-3 field">
+                <label for="id_categoria" class="block">Categoría</label>
+                <p-select
+                  id="id_categoria"
+                  [options]="categoriesList"
+                  optionLabel="name"
+                  optionValue="value"
+                  formControlName="id_categoria"
+                  placeholder="Categoria"
+                  showClear="true"
+                  appendTo="body"
+                  [filter]="true"
+                  filterBy="name"
+                  class="w-full"
+                ></p-select>
 
-        <!-- cantidad -->
-        <div class="col-12 md:col-6 lg:col-3 field">
-          <label for="cantidad_stock" class="block">Cantidad de stock</label>
-          <input
-            pInputText
-            id="cantidad_stock"
-            formControlName="cantidad_stock"
-            class="w-full"
-          />
-          @if (_helperService.getFormControlNgClass(frm, 'cantidad_stock') &&
-          frm.controls['cantidad_stock'].hasError('required')) {
-          <small class="text-red-500 block"> La cantidad es requerida </small>
-          }
-           @if ( _helperService.getFormControlNgClass(frm, 'cantidad_stock') &&
-          frm.controls['cantidad_stock'].hasError('pattern')) {
-          <small class="text-red-500 block"> Cantidad stock sólo permite números </small>
-          }
-        </div>
+                @if (_helperService.getFormControlNgClass(frm, 'id_categoria')
+                && frm.controls['id_categoria'].hasError('required')) {
+                <small class="text-red-500 block">
+                  Categoría es requerida
+                </small>
+                }
+              </div>
 
-        <!-- Descripción -->
-        <div class="col-12 field">
-          <label for="descripcion" class="block">Descripción</label>
-          <textarea pInputTextarea pTextarea [autoResize]="false"
-            id="descripcion"
-            formControlName="descripcion"
-            class="w-full"
-          ></textarea>
-          @if (_helperService.getFormControlNgClass(frm, 'descripcion') &&
-          frm.controls['descripcion'].hasError('required')) {
-          <small class="text-red-500 block"> Descripción es requerida </small>
-          }
-        </div>
+              <!-- cantidad -->
+              <div class="col-12 md:col-6 lg:col-3 field">
+                <label for="cantidad_stock" class="block"
+                  >Cantidad de stock</label
+                >
+                <input
+                  pInputText
+                  id="cantidad_stock"
+                  formControlName="cantidad_stock"
+                  class="w-full"
+                />
+                @if (_helperService.getFormControlNgClass(frm, 'cantidad_stock')
+                && frm.controls['cantidad_stock'].hasError('required')) {
+                <small class="text-red-500 block">
+                  La cantidad es requerida
+                </small>
+                } @if ( _helperService.getFormControlNgClass(frm,
+                'cantidad_stock') &&
+                frm.controls['cantidad_stock'].hasError('pattern')) {
+                <small class="text-red-500 block">
+                  Cantidad stock sólo permite números
+                </small>
+                }
+              </div>
 
-        <!-- Instrucciones de cuidado -->
-        <div class="col-12 field">
-          <label for="instrucciones_de_cuidado" class="block"
-            >Instrucciones de cuidado</label
-          >
-          <textarea pInputTextarea pTextarea [autoResize]="false"
-            id="instrucciones_de_cuidado"
-            formControlName="instrucciones_de_cuidado"
-            class="w-full"
-            [ngClass]="
-              _helperService.getFormControlNgClass(
-                frm,
-                'instrucciones_de_cuidado',
-                'ng-invalid ng-dirty'
-              )
-            "
-          ></textarea>
+              <!-- Descripción -->
+              <div class="col-12 field">
+                <label for="descripcion" class="block">Descripción</label>
+                <textarea
+                  pInputTextarea
+                  pTextarea
+                  [autoResize]="false"
+                  id="descripcion"
+                  formControlName="descripcion"
+                  class="w-full"
+                ></textarea>
+                @if (_helperService.getFormControlNgClass(frm, 'descripcion') &&
+                frm.controls['descripcion'].hasError('required')) {
+                <small class="text-red-500 block">
+                  Descripción es requerida
+                </small>
+                }
+              </div>
 
-          @if (_helperService.getFormControlNgClass(frm,
-          'instrucciones_de_cuidado') &&
-          frm.controls['instrucciones_de_cuidado'].hasError('required')) {
-          <small class="text-red-500 block">
-            Instrucciones de cuidado es requerido
-          </small>
-          }
-        </div>
+              <!-- Instrucciones de cuidado -->
+              <div class="col-12 field">
+                <label for="instrucciones_de_cuidado" class="block"
+                  >Instrucciones de cuidado</label
+                >
+                <textarea
+                  pInputTextarea
+                  pTextarea
+                  [autoResize]="false"
+                  id="instrucciones_de_cuidado"
+                  formControlName="instrucciones_de_cuidado"
+                  class="w-full"
+                  [ngClass]="
+                    _helperService.getFormControlNgClass(
+                      frm,
+                      'instrucciones_de_cuidado',
+                      'ng-invalid ng-dirty'
+                    )
+                  "
+                ></textarea>
 
-
-      </form>
+                @if (_helperService.getFormControlNgClass(frm,
+                'instrucciones_de_cuidado') &&
+                frm.controls['instrucciones_de_cuidado'].hasError('required')) {
+                <small class="text-red-500 block">
+                  Instrucciones de cuidado es requerido
+                </small>
+                }
+              </div>
+            </form>
+     
+            
     </ng-template>
 
     <ng-template #footer>

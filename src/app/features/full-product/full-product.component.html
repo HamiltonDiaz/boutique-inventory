@@ -1,0 +1,333 @@
+<div class="card">
+  <p-toast />
+
+  <!-- NUEVO HEADER -->
+
+  <p-toolbar styleClass="mb-2">
+    <ng-template #start>
+      <p-button
+        label="Nuevo"
+        icon="pi pi-plus"
+        class="mr-2"
+        (onClick)="openModalNew()"
+      />
+      <p-button
+        severity="danger"
+        label="Borrar"
+        icon="pi pi-trash"
+        outlined
+        (onClick)="deleteAllRegisters()"
+        [disabled]="!selectedRegister || !selectedRegister.length"
+      />
+    </ng-template>
+
+    <ng-template #end>
+      <p-button
+        label="Export"
+        icon="pi pi-upload"
+        severity="secondary"
+        (onClick)="exportDataCSV($event)"
+      />
+    </ng-template>
+  </p-toolbar>
+
+  <!-- FIN NUEVO HEADER -->
+
+  <!-- NUEVA TABLA -->
+
+  <p-table
+    #table_custom
+    [value]="dataForTable"
+    [rows]="10"
+    [columns]="columns"
+    [paginator]="true"
+    [globalFilterFields]="getFilterFields()"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [(selection)]="selectedRegister"
+    [rowHover]="true"
+    dataKey="id_cliente"
+    currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+    [showCurrentPageReport]="true"
+    [scrollable]="true"
+    scrollHeight="300px"
+    [rowsPerPageOptions]="[10, 25, 50]"
+  >
+    <ng-template #caption>
+      <div class="flex items-center justify-between">
+        <h5 class="m-0">{{ componentTitle }}</h5>
+        <p-iconfield>
+          <p-inputicon styleClass="pi pi-search" />
+          <input
+            pInputText
+            type="text"
+            (input)="
+              table_custom?.filterGlobal($any($event.target).value, 'contains')
+            "
+            placeholder="Buscar..."
+          />
+        </p-iconfield>
+      </div>
+    </ng-template>
+    <ng-template #header>
+      <tr>
+        <th style="width: 3rem">
+          <p-tableHeaderCheckbox />
+        </th>
+
+        <ng-container *ngFor="let col of columns">
+          <th
+            *ngIf="col.field != 'actions'"
+            [ngStyle]="{ 'min-width': col.minWidth }"
+            [ngClass]="col.class"
+            [pSortableColumn]="col.order ? col.field : undefined"
+          >
+            {{ col.header }}
+            <p-sortIcon
+              *ngIf="col.order"
+              class="float-right"
+              [field]="col.field"
+            ></p-sortIcon>
+          </th>
+
+          <th *ngIf="col.field == 'actions'" [ngClass]="col.class">
+            {{ col.header }}
+          </th>
+        </ng-container>
+      </tr>
+    </ng-template>
+    <ng-template #body let-item>
+      <tr>
+        <td style="width: 3rem">
+          <p-tableCheckbox [value]="item" />
+        </td>
+        <td>
+          {{ item.producto.nombre | uppercase }}
+        </td>
+        <td>
+          {{ item.talla.talla | uppercase }}
+        </td>
+        <td>
+          {{ item.color.color | uppercase }}
+        </td>
+        <td class="text-center">{{ item.precio | currency }}</td>
+        <td class="text-center">
+          <p-button
+            [icon]="item.activo ? 'pi pi-check' : 'pi pi-times'"
+            [rounded]="true"
+            [text]="true"
+            size="small"
+            [severity]="item.activo ? 'primary' : 'danger'"
+          />
+        </td>
+        <td class="text-center">
+          <p-button
+            icon="pi pi-pencil"
+            class="mr-2"
+            [rounded]="true"
+            [outlined]="true"
+            (click)="editRegister(item)"
+            size="small"
+          />
+          <p-button
+            icon="pi pi-trash"
+            severity="danger"
+            [rounded]="true"
+            [outlined]="true"
+            (click)="deleteRegister(item)"
+            size="small"
+          />
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="columns.length + 1">
+          <div class="pt-2 pb-2 text-center">No se encontraron registros.</div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+  <!-- FIN NUEVA TABLA -->
+
+  <!-- MODAL  -->
+  <p-dialog
+    [(visible)]="createEditDialog"
+    [style]="dialogStyle"
+    [header]="titleDialog"
+    [modal]="true"
+    (onHide)="clearForm()"
+  >
+    <ng-template #content>
+      <form [formGroup]="frm" class="grid" autocomplete="off">
+        <!--Estado   -->
+        <div class="col-6 md:col-6 lg:col-1 field">
+          <label for="activo" class="block">Estado</label>
+          <p-toggleswitch id="activo" formControlName="activo"></p-toggleswitch>
+        </div>
+
+        <!-- Productos -->
+        <div class="col-12 md:col-6 lg:col-3 field">
+          <label for="id" class="block">Talla</label>
+          <p-select
+            id="id_producto"
+            [options]="productList"
+            optionLabel="name"
+            optionValue="value"
+            formControlName="id_producto"
+            placeholder="Productos"
+            showClear="true"
+            appendTo="body"
+            [filter]="true"
+            filterBy="name"
+            class="w-full"
+          ></p-select>
+
+          @if (_helperService.getFormControlNgClass(frm, 'id_producto') &&
+          frm.controls['id_producto'].hasError('required')) {
+          <small class="text-red-500 block"> Producto es requerido </small>
+          }
+        </div>
+
+        <!-- Tallas -->
+        <div class="col-12 md:col-6 lg:col-2 field">
+          <label for="id_talla" class="block">Talla</label>
+          <p-select
+            id="id_talla"
+            [options]="sizesList"
+            optionLabel="name"
+            optionValue="value"
+            formControlName="id_talla"
+            placeholder="Talla"
+            showClear="true"
+            appendTo="body"
+            [filter]="true"
+            filterBy="name"
+            class="w-full"
+          ></p-select>
+
+          @if (_helperService.getFormControlNgClass(frm, 'id_talla') &&
+          frm.controls['id_talla'].hasError('required')) {
+          <small class="text-red-500 block"> Talla es requerida </small>
+          }
+        </div>
+
+        <!-- Color -->
+        <div class="col-12 md:col-6 lg:col-2 field">
+          <label for="id_color" class="block">Color</label>
+          <p-select
+            id="id_color"
+            [options]="colorsList"
+            optionLabel="name"
+            optionValue="value"
+            formControlName="id_color"
+            placeholder="Color"
+            showClear="true"
+            appendTo="body"
+            [filter]="true"
+            filterBy="name"
+            class="w-full"
+          ></p-select>
+
+          @if (_helperService.getFormControlNgClass(frm, 'id_color') &&
+          frm.controls['id_color'].hasError('required')) {
+          <small class="text-red-500 block"> Color es requerido </small>
+          }
+        </div>
+
+        <!-- precio -->
+        <div class="col-12 md:col-6 lg:col-2 field">
+          <label for="precio" class="block">Precio</label>
+          <input
+            pInputText
+            id="precio"
+            formControlName="precio"
+            class="w-full"
+          />
+          @if (_helperService.getFormControlNgClass(frm, 'precio') &&
+          frm.controls['precio'].hasError('required')) {
+          <small class="text-red-500 block"> Precio es requerido </small>
+          } @if ( _helperService.getFormControlNgClass(frm, 'precio') &&
+          frm.controls['precio'].hasError('pattern')) {
+          <small class="text-red-500 block">
+            Precio sólo permite números
+          </small>
+          }
+        </div>
+
+        <!-- Cantidad -->
+        <div class="col-12 md:col-6 lg:col-2 field">
+          <label for="cantidad" class="block">Cantidad</label>
+          <input
+            pInputText
+            id="cantidad"
+            formControlName="cantidad"
+            class="w-full"
+          />
+          @if (_helperService.getFormControlNgClass(frm, 'cantidad') &&
+          frm.controls['cantidad'].hasError('required')) {
+          <small class="text-red-500 block"> Cantidad es requerida </small>
+          } @if ( _helperService.getFormControlNgClass(frm, 'cantidad') &&
+          frm.controls['cantidad'].hasError('pattern')) {
+          <small class="text-red-500 block">
+            Cantidad sólo permite números
+          </small>
+          }
+        </div>
+
+        <!-- Foto -->
+        <div class="col-12 field">
+          <div class="flex flex-wrap gap-5 align-items-center">
+            <p-fileupload
+              #foto
+              mode="basic"
+              chooseLabel="Seleccionar"
+              chooseIcon="pi pi-upload"
+              name="demo[]"
+              accept="image/*"
+              (onSelect)="onSelectImage($event)"
+            />
+            @if (alertImageVisible) {
+            <p-message severity="error" size="small"
+              >Debe seleccionar una imagen</p-message
+            >
+            } @if (currentImageUrl) {
+
+            <div class="h-[100px]">
+              <p-image
+                [src]="currentImageUrl"
+                alt="Image"
+                [style]="{ width: '80px', height: 'auto' }"
+                preview="true"
+              />
+            </div>
+            }
+          </div>
+        </div>
+      </form>
+    </ng-template>
+
+    <ng-template #footer>
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        text
+        (click)="hideDialog()"
+        severity="danger"
+        [disabled]="loadingButtonSave"
+      />
+      <p-button
+        label="Guadar"
+        icon="pi pi-check"
+        (click)="save()"
+        [loading]="loadingButtonSave"
+      />
+    </ng-template>
+  </p-dialog>
+
+  <p-confirmDialog
+    [breakpoints]="{ '960px': '75vw', '640px': '100vw' }"
+    [style]="{ width: '30vw' }"
+    [baseZIndex]="10000"
+    rejectButtonStyleClass="p-button-danger"
+  />
+</div>
