@@ -20,6 +20,8 @@ export class AuthService implements AuthServiceInterface {
             tap((response) => {
                 if ((response.status === 201 || response.status === 200) && response.data?.token) {
                     localStorage.setItem('token', response.data.token);
+                    localStorage.setItem('user_id', response.data.usuario.id_usuario);
+
                 }
             })
         );
@@ -31,6 +33,7 @@ export class AuthService implements AuthServiceInterface {
 
     logout(): boolean {
         localStorage.removeItem('token')
+        localStorage.removeItem('user_id')
         return this.repository.logout();
     }
 }

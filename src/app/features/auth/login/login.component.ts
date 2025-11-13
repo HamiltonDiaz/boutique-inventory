@@ -19,6 +19,7 @@ import { LoginDto } from '../../../core/dtos/auth/login.dto';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from "primeng/toast";
 import { Router } from '@angular/router';
+import { RoutesEnum } from '../../../shared/routes.enum';
 
 @Component({
   selector: 'app-login',
@@ -90,7 +91,8 @@ export class LoginComponent implements OnInit {
         });
       }
     );
-    if (response?.status == 200) {   
+
+    if (response?.status == 200) {     
       this.messageService.add({
         severity: 'success',
         summary: 'Mensaje del sistema',
@@ -98,7 +100,7 @@ export class LoginComponent implements OnInit {
         life: 3000,
       });
       setTimeout(() => {        
-        this._router.navigate(['dashboard']);
+        this._router.navigate([RoutesEnum.DASHBOARD]);
       }, 700);
     }
   }

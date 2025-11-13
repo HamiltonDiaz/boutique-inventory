@@ -377,7 +377,7 @@ export class FullProductComponent implements OnInit {
   }
 
   editRegister(item: FullProductModel) {
-    this.idRegisterToEdit = item.id_producto;
+    this.idRegisterToEdit = item.id_pxc;
     this.titleDialog = 'Editar registro';
     this.createRegister = false;
     this.createEditDialog = true;

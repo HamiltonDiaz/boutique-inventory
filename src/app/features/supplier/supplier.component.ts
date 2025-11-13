@@ -60,7 +60,7 @@ export class SupplierComponent implements OnInit {
   @ViewChild('table_custom') table_custom!: Table;
   componentTitle: string = 'Proveedores';
   customersTable: SupplierModel[] = [];
-  selectedCustomers!: SupplierModel[] | null;
+  selectedRegister!: SupplierModel[] | null;
   public frm!: FormGroup;
   createRegister: boolean = true;
   createEditDialog: boolean = false;

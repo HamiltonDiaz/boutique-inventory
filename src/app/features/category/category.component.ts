@@ -59,7 +59,7 @@ export class CategoryComponent implements OnInit{
   @ViewChild('table_custom') table_custom!: Table;
   componentTitle: string = 'Cateorías';
   dataForTable: CategoryModel[] = [];
-  selectedCustomers!: CategoryModel[] | null;
+  selectedRegister!: CategoryModel[] | null;
   public frm!: FormGroup;
   createRegister: boolean = true;
   createEditDialog: boolean = false;

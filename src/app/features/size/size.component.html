@@ -16,7 +16,7 @@
         icon="pi pi-trash"
         outlined
         (onClick)="deleteAllRegisters()"
-        [disabled]="!selectedCustomers || !selectedCustomers.length"
+        [disabled]="!selectedRegister || !selectedRegister.length"
       />
     </ng-template>
 
@@ -40,7 +40,7 @@
     [paginator]="true"
     [globalFilterFields]="getFilterFields()"
     [tableStyle]="{ 'min-width': '75rem' }"
-    [(selection)]="selectedCustomers"
+    [(selection)]="selectedRegister"
     [rowHover]="true"
     dataKey="id_cliente"
     currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"

@@ -62,7 +62,7 @@ export class ProductsComponent implements OnInit {
   @ViewChild('table_custom') table_custom!: Table;
   componentTitle: string = 'Productos';
   customersTable: ProductModel[] = [];
-  selectedCustomers!: ProductModel[] | null;
+  selectedRegister!: ProductModel[] | null;
   public frm!: FormGroup;
   
   createRegister: boolean = true;
@@ -135,6 +135,7 @@ export class ProductsComponent implements OnInit {
         { value: null, disabled: false },
         Validators.compose([
           Validators.required,
+          Validators.min(0),
           Validators.pattern('^[0-9]*$'),
         ]),
       ],

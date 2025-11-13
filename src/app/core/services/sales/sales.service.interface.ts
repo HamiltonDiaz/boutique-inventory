@@ -7,8 +7,8 @@ import { UpdateSalesDto } from "../../dtos/sales/update-sales.dto";
 
 export interface SalesServiceInterface {
   findAll(): Observable<ResponseModel<SalesModel[]>>;
-  findById(id: string): Observable<ResponseModel<SalesModel>>;
+  findById(id: number): Observable<ResponseModel<SalesModel>>;
   create(data: CreateSalesDto): Observable<ResponseModel<SalesModel>>;
-  update(id: string, data: UpdateSalesDto): Observable<ResponseModel<boolean>>;
-  delete(id: string): Observable<ResponseModel<boolean>>;
+  update(id: number, data: UpdateSalesDto): Observable<ResponseModel<boolean>>;
+  delete(id: number): Observable<ResponseModel<boolean>>;
 }

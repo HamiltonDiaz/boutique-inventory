@@ -11,7 +11,7 @@ import { UpdateSalesDto } from '../../dtos/sales/update-sales.dto'
 
 @Injectable({ providedIn: 'root' })
 export class SalesRepository implements SalesRepositoryInterface {
-  API_URL = `${environment.url}Sales/`
+  API_URL = `${environment.url}venta/`
 
   constructor(private _httpClient: HttpClient) {}
   
@@ -22,7 +22,7 @@ export class SalesRepository implements SalesRepositoryInterface {
     )
   }
 
-  findById(id: string): Observable<ResponseModel<SalesModel>> {
+  findById(id: number): Observable<ResponseModel<SalesModel>> {
     return this._httpClient.get<ResponseModel<SalesModel>>(
       `${this.API_URL}${id}`
     )
@@ -38,14 +38,14 @@ export class SalesRepository implements SalesRepositoryInterface {
   }
 
 
-  update(id: string, data: UpdateSalesDto): Observable<ResponseModel<boolean>> {
+  update(id: number, data: UpdateSalesDto): Observable<ResponseModel<boolean>> {
     return this._httpClient.patch<ResponseModel<boolean>>(
       `${this.API_URL}${id}`,
       data
     )
   }
 
-  delete(id: string): Observable<ResponseModel<boolean>> {
+  delete(id: number): Observable<ResponseModel<boolean>> {
     return this._httpClient.delete<ResponseModel<boolean>>(
       `${this.API_URL}${id}`
     )

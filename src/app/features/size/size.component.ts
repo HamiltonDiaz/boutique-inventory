@@ -59,7 +59,7 @@ export class SizeComponent implements OnInit {
 @ViewChild('table_custom') table_custom!: Table;
   componentTitle: string = 'Tallas';
   dataForTable: SizeModel[] = [];
-  selectedCustomers!: SizeModel[] | null;
+  selectedRegister!: SizeModel[] | null;
   public frm!: FormGroup;
   createRegister: boolean = true;
   createEditDialog: boolean = false;

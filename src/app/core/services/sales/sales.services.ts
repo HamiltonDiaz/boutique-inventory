@@ -18,7 +18,7 @@ export class SalesService implements SalesServiceInterface {
   findAll(): Observable<ResponseModel<SalesModel[]>> {
     return this.repository.findAll();
   }
-  findById(id: string): Observable<ResponseModel<SalesModel>> {
+  findById(id: number): Observable<ResponseModel<SalesModel>> {
     return this.repository.findById(id);
   }
 
@@ -26,11 +26,11 @@ export class SalesService implements SalesServiceInterface {
     return this.repository.create(data);
   }
 
-  update(id: string,data: UpdateSalesDto): Observable<ResponseModel<boolean>> {
+  update(id: number,data: UpdateSalesDto): Observable<ResponseModel<boolean>> {
     return this.repository.update(id, data);
   }
 
-  delete(id: string): Observable<ResponseModel<boolean>> {
+  delete(id: number): Observable<ResponseModel<boolean>> {
     return this.repository.delete(id);
   }
 }

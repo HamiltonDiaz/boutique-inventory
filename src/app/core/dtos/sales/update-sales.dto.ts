@@ -1,4 +1,9 @@
+import { ArticleSalesDto } from "./article-sales-dto"
+
 export interface UpdateSalesDto {
-  nombre: string;
-  descripcion: string;
+  id_venta:  number
+  id_cliente: string,
+  id_usuario: string,
+  fecha: string 
+  articulosVenta: ArticleSalesDto[]
 }

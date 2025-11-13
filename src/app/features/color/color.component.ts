@@ -62,7 +62,7 @@ export class ColorComponent implements OnInit {
   @ViewChild('table_custom') table_custom!: Table;
   componentTitle: string = 'Colores';
   dataForTable: ColorModel[] = [];
-  selectedCustomers!: ColorModel[] | null;
+  selectedRegister!: ColorModel[] | null;
   public frm!: FormGroup;
   createRegister: boolean = true;
   createEditDialog: boolean = false;

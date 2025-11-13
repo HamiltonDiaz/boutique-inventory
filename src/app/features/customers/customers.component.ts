@@ -43,7 +43,7 @@ import { CountryModel } from '../../core/models/country/country.model';
     ConfirmDialog,
     InputTextModule,
     TextareaModule,
-    CommonModule,    
+    CommonModule,
     IconFieldModule,
     InputIconModule,
     ButtonModule,
@@ -58,7 +58,7 @@ import { CountryModel } from '../../core/models/country/country.model';
 export class CustomersComponent implements OnInit {
   @ViewChild('table_custom') table_custom!: Table;
   customersTable: CustomersModel[] = [];
-  selectedCustomers!: CustomersModel[] | null;
+  selectedRegister!: CustomersModel[] | null;
   componentTitle: string = 'Clientes';
   public frm!: FormGroup;
   createRegister: boolean = true;
@@ -176,10 +176,9 @@ export class CustomersComponent implements OnInit {
     }
     this.optionsCountries = response.data.map((country: CountryModel) => ({
       value: country.id_pais,
-      name: country.nombre
-  }));
+      name: country.nombre,
+    }));
   }
-
 
   hideDialog(): void {
     this.createEditDialog = false;
@@ -232,7 +231,7 @@ export class CustomersComponent implements OnInit {
     };
   }
 
-  buildDataToUpdate(item: CustomersModel):void {  
+  buildDataToUpdate(item: CustomersModel): void {
     this.frm.controls['direccion'].setValue(item.direccion);
     this.frm.controls['activo'].setValue(item.activo);
     this.frm.controls['cedula'].setValue(item.persona.cedula);
@@ -243,7 +242,7 @@ export class CustomersComponent implements OnInit {
     this.frm.controls['genero'].setValue(item.persona.genero);
     this.frm.controls['ciudad'].setValue(item.persona.ciudad);
     this.frm.controls['edad'].setValue(item.persona.edad);
-    this.frm.controls['id_pais'].setValue( item.persona.pais.id_pais);    
+    this.frm.controls['id_pais'].setValue(item.persona.pais.id_pais);
   }
 
   async save() {
@@ -271,7 +270,7 @@ export class CustomersComponent implements OnInit {
           life: 3000,
         });
       });
-      if (response?.status == 200 || response?.status == 201 ){
+      if (response?.status == 200 || response?.status == 201) {
         this.messageService.add({
           severity: 'success',
           summary: 'Mensaje del sistema',
@@ -281,9 +280,9 @@ export class CustomersComponent implements OnInit {
       }
     }
 
-    if (!this.createRegister) {      
+    if (!this.createRegister) {
       const response = await lastValueFrom(
-        this._customersService.update(this.idRegisterToEdit,data)
+        this._customersService.update(this.idRegisterToEdit, data)
       ).catch((error) => {
         this.messageService.add({
           severity: 'error',
@@ -304,25 +303,22 @@ export class CustomersComponent implements OnInit {
 
     this.loadingButtonSave = false;
     await this.loadCustomers();
-    this.clearForm()
+    this.clearForm();
     this.hideDialog();
   }
-
 
   clearForm() {
     this.frm.reset();
     this.frm.controls['activo'].setValue(true);
   }
-  
-  editRegister(item: CustomersModel) {    
+
+  editRegister(item: CustomersModel) {
     this.idRegisterToEdit = item.id_cliente;
     this.titleDialog = 'Editar registro';
     this.createRegister = false;
     this.createEditDialog = true;
     this.buildDataToUpdate(item);
   }
-
-
 
   deleteRegister(item: CustomersModel) {
     this.confirmationService.confirm({

@@ -57,7 +57,7 @@ export class CountryComponent implements OnInit {
   @ViewChild('table_custom') table_custom!: Table;
   componentTitle: string = 'Países';
   dataForTable: CountryModel[] = [];
-  selectedCustomers!: CountryModel[] | null;
+  selectedRegister!: CountryModel[] | null;
   public frm!: FormGroup;
   createRegister: boolean = true;
   createEditDialog: boolean = false;
