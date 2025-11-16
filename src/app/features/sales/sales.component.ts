@@ -190,7 +190,7 @@ export class SalesComponent implements OnInit {
     this.frm.controls['id_cliente'].enable();
     this.frm.controls['id_pxc'].enable();
     this.frm.controls['cantidad'].enable();
-    
+
   }
 
   async loadDataForTable(): Promise<void> {
@@ -275,7 +275,7 @@ export class SalesComponent implements OnInit {
       id_venta: Number(this.idRegisterToEdit),
       id_cliente: formValues.id_cliente.data.id_cliente,
       id_usuario: localStorage.getItem('user_id') ?? '',
-      fecha: Date.now().toString(),
+      fecha: new Date().toISOString(),
       articulosVenta: this.articleSalesList,
     };
   }
@@ -293,7 +293,7 @@ export class SalesComponent implements OnInit {
         const productoCompleto = this.listProducts.find(
           (item) => item.id === article.id_pxc.toString()
         );
-        
+
         return {
           id_pxc: article.id_axv.toString(),
           cantidad_vendida: article.cantidad_vendida,
@@ -301,7 +301,7 @@ export class SalesComponent implements OnInit {
         };
       }
     );
-    this.articleSalesList = products;    
+    this.articleSalesList = products;
   }
 
   async save() {
