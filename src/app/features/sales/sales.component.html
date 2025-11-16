@@ -103,15 +103,16 @@
         <td>
           {{ item.id_venta }}
         </td>
-         <td class="text-center">{{ item.cliente.persona.cedula }}</td>
+        <td class="text-center">{{ item.cliente.persona.cedula }}</td>
         <td>
           {{
-            (item.cliente.persona?.nombre ?? "") + " " + (item.cliente.persona?.apellido ?? "")
-              | uppercase
+            (item.cliente.persona?.nombre ?? "") +
+              " " +
+              (item.cliente.persona?.apellido ?? "") | uppercase
           }}
         </td>
-        <td class="text-center">{{ item.valor_total | currency}}</td>        
-    
+        <td class="text-center">{{ item.valor_total | currency }}</td>
+
         <td class="text-center">
           <!-- <p-button
             icon="pi pi-pencil"
@@ -121,8 +122,8 @@
             (click)="editRegister(item)"
             size="small"
           /> -->
-          
-        <p-button
+
+          <p-button
             icon="pi pi-eye"
             class="mr-2"
             [rounded]="true"
@@ -130,7 +131,7 @@
             (click)="openModalSee(item)"
             size="small"
           />
-          
+
           <p-button
             icon="pi pi-trash"
             severity="danger"
@@ -175,7 +176,7 @@
               appendTo="body"
               showClear="true"
               optionLabel="label"
-              optionValue="id"
+              dataKey="id"
               emptyMessage="Sin resultados"
             />
             <label for="id_cliente">Cliente</label>
@@ -240,7 +241,7 @@
           }
         </div>
 
-        @if(!visualizationMode){     
+        @if(!visualizationMode){
         <!-- Boton agregar -->
         <div class="col-12 md:col-6 lg:col-1 field">
           <p-button
@@ -252,7 +253,7 @@
             size="small"
           />
         </div>
-    }
+        }
       </form>
       <!-- Tabla Productos -->
 
@@ -279,7 +280,10 @@
                   ></p-sortIcon>
                 </th>
 
-                <th *ngIf="col.field == 'actions'" [ngClass]="col.class">
+                <th
+                  *ngIf="col.field == 'actions' && !visualizationMode"
+                  [ngClass]="col.class"
+                >
                   {{ col.header }}
                 </th>
               </ng-container>
@@ -291,32 +295,30 @@
                 {{ item.nombre_producto }}
               </td>
 
-              @if(visualizationMode){ 
-                <td>{{ item.cantidad_vendida }}</td>
-               }
-              @else {
-                  <td
-                    [pEditableColumn]="item.cantidad_vendida"
-                    pEditableColumnField="cantidad_vendida"
-                  >
-                    <p-cellEditor>
-                      <ng-template #input>
-                        <input
-                          pInputText
-                          type="text"
-                          [(ngModel)]="item.cantidad_vendida"
-                          required
-                        />
-                      </ng-template>
-                      <ng-template #output>
-                        {{ item.cantidad_vendida }}
-                        <i class="pi pi-pencil text-primary text-xs ml-2"></i>
-                      </ng-template>
-                    </p-cellEditor>
-                  </td>
-              }
+              @if(visualizationMode){
+              <td>{{ item.cantidad_vendida }}</td>
+              } @else {
+              <td
+                [pEditableColumn]="item.cantidad_vendida"
+                pEditableColumnField="cantidad_vendida"
+              >
+                <p-cellEditor>
+                  <ng-template #input>
+                    <input
+                      pInputText
+                      type="text"
+                      [(ngModel)]="item.cantidad_vendida"
+                      required
+                    />
+                  </ng-template>
+                  <ng-template #output>
+                    {{ item.cantidad_vendida }}
+                    <i class="pi pi-pencil text-primary text-xs ml-2"></i>
+                  </ng-template>
+                </p-cellEditor>
+              </td>
+              } @if(!visualizationMode){
               <td>
-                @if(!visualizationMode){     
                 <p-button
                   icon="pi pi-eraser"
                   severity="danger"
@@ -326,8 +328,8 @@
                   (click)="deleteRow(item)"
                   size="small"
                 />
-                }
               </td>
+              }
             </tr>
           </ng-template>
         </p-table>
@@ -337,19 +339,22 @@
 
     <ng-template #footer>
       <p-button
-        label="Cancelar"
+        [label]="!visualizationMode ? 'Cancelar' : 'Cerrar'"
         icon="pi pi-times"
         text
         (click)="hideDialog()"
         severity="danger"
         [disabled]="loadingButtonSave"
       />
-      <p-button
+      @if (!visualizationMode) {
+      
+      <p-button 
         label="Guadar"
         icon="pi pi-check"
         (click)="save()"
         [loading]="loadingButtonSave"
       />
+      }
     </ng-template>
   </p-dialog>
 

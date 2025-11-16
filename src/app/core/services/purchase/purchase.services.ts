@@ -16,7 +16,7 @@ export class PurchaseService implements PurchaseServiceInterface {
   findAll(): Observable<ResponseModel<PurchaseModel[]>> {
     return this.repository.findAll();
   }
-  findById(id: string): Observable<ResponseModel<PurchaseModel>> {
+  findById(id: number): Observable<ResponseModel<PurchaseModel>> {
     return this.repository.findById(id);
   }
 
@@ -24,11 +24,11 @@ export class PurchaseService implements PurchaseServiceInterface {
     return this.repository.create(data);
   }
 
-  update(id: string,data: UpdatePurchaseDto): Observable<ResponseModel<boolean>> {
+  update(id: number,data: UpdatePurchaseDto): Observable<ResponseModel<boolean>> {
     return this.repository.update(id, data);
   }
 
-  delete(id: string): Observable<ResponseModel<boolean>> {
+  delete(id: number): Observable<ResponseModel<boolean>> {
     return this.repository.delete(id);
   }
 }

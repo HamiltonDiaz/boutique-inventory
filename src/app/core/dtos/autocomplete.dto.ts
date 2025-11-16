@@ -1,5 +1,5 @@
 export interface AutocompleteDto<T = unknown> {
-  id: string;
+  id: string | number;
   label: string;
   data?: T
 }

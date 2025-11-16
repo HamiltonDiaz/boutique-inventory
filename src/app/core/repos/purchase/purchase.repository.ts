@@ -13,7 +13,7 @@ import { UpdatePurchaseDto } from '../../dtos/purchase/update-purchase.dto'
 
 @Injectable({ providedIn: 'root' })
 export class PurchaseRepository implements PurchaseRepositoryInterface {
-  API_URL = `${environment.url}Purchase/`
+  API_URL = `${environment.url}compra/`
 
   constructor(private _httpClient: HttpClient) {}
   
@@ -24,7 +24,7 @@ export class PurchaseRepository implements PurchaseRepositoryInterface {
     )
   }
 
-  findById(id: string): Observable<ResponseModel<PurchaseModel>> {
+  findById(id: number): Observable<ResponseModel<PurchaseModel>> {
     return this._httpClient.get<ResponseModel<PurchaseModel>>(
       `${this.API_URL}${id}`
     )
@@ -40,14 +40,14 @@ export class PurchaseRepository implements PurchaseRepositoryInterface {
   }
 
 
-  update(id: string, data: UpdatePurchaseDto): Observable<ResponseModel<boolean>> {
+  update(id: number, data: UpdatePurchaseDto): Observable<ResponseModel<boolean>> {
     return this._httpClient.patch<ResponseModel<boolean>>(
       `${this.API_URL}${id}`,
       data
     )
   }
 
-  delete(id: string): Observable<ResponseModel<boolean>> {
+  delete(id: number): Observable<ResponseModel<boolean>> {
     return this._httpClient.delete<ResponseModel<boolean>>(
       `${this.API_URL}${id}`
     )

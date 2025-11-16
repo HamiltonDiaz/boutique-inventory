@@ -8,8 +8,8 @@ import { CreatePurchaseDto } from '../../dtos/purchase/create-purchase.dto';
 
 export interface PurchaseRepositoryInterface {
   findAll(): Observable<ResponseModel<PurchaseModel[]>>;
-  findById(id: string): Observable<ResponseModel<PurchaseModel>>;
+  findById(id: number): Observable<ResponseModel<PurchaseModel>>;
   create(data: CreatePurchaseDto): Observable<ResponseModel<PurchaseModel>>;
-  update(id: string, data: UpdatePurchaseDto): Observable<ResponseModel<boolean>>;
-  delete(id: string): Observable<ResponseModel<boolean>>;
+  update(id: number, data: UpdatePurchaseDto): Observable<ResponseModel<boolean>>;
+  delete(id: number): Observable<ResponseModel<boolean>>;
 }

@@ -30,7 +30,7 @@ import { ICols } from '../../core/dtos/icos.dto';
 import { HelpersService } from '../../core/services/common/helper.service';
 import { CustomersService } from '../../core/services/customers/customers.services';
 import { CustomersModel } from '../../core/models/customers/customers.model';
-import { AutocompleteDto } from '../../core/dtos/autocomplete.dto copy';
+import { AutocompleteDto } from '../../core/dtos/autocomplete.dto';
 import { ArticleSalesDto } from '../../core/dtos/sales/article-sales-dto';
 import { FullProductService } from '../../core/services/product/full-product.services';
 import { FullProductModel } from '../../core/models/product/full-product.model';
@@ -70,7 +70,7 @@ export class SalesComponent implements OnInit {
   @ViewChild('table_custom') table_custom!: Table;
   dataForTable: SalesModel[] = [];
   selectedRegister!: SalesModel[] | null;
-  componentTitle: string = 'Clientes';
+  componentTitle: string = 'Ventas';
   public frm!: FormGroup;
   createRegister: boolean = true;
   visualizationMode: boolean = false;
@@ -187,6 +187,10 @@ export class SalesComponent implements OnInit {
     this.visualizationMode = false;
     this.createRegister = true;
     this.clearForm();
+    this.frm.controls['id_cliente'].enable();
+    this.frm.controls['id_pxc'].enable();
+    this.frm.controls['cantidad'].enable();
+    
   }
 
   async loadDataForTable(): Promise<void> {
@@ -195,7 +199,6 @@ export class SalesComponent implements OnInit {
       console.error('Error al cargar datos de tabla:', response.message);
       return;
     }
-    console.log(response.data);
     this.dataForTable = response.data;
   }
 
@@ -259,13 +262,18 @@ export class SalesComponent implements OnInit {
     this.idRegisterToEdit = 0;
     this.createEditDialog = true;
     this.buildDataToUpdate(item);
+
+     // Luego deshabilitar los campos
+    this.frm.controls['id_cliente'].disable();
+    this.frm.controls['id_pxc'].disable();
+    this.frm.controls['cantidad'].disable();
   }
 
   buildDataToSave(): CreateSalesDto | UpdateSalesDto {
     const formValues = this.frm.getRawValue();
     return {
       id_venta: Number(this.idRegisterToEdit),
-      id_cliente: formValues.id_cliente,
+      id_cliente: formValues.id_cliente.data.id_cliente,
       id_usuario: localStorage.getItem('user_id') ?? '',
       fecha: Date.now().toString(),
       articulosVenta: this.articleSalesList,
@@ -273,8 +281,13 @@ export class SalesComponent implements OnInit {
   }
 
   buildDataToUpdate(item: SalesModel): void {
-    //TODO: Pendiente asignar cliente
+      // Buscar el objeto completo del cliente
+  const clienteSeleccionado = this.listClients.find(
+    (cliente) => cliente.id === item.id_cliente
+  );
 
+   // Establecer el objeto completo en el FormControl
+  this.frm.controls['id_cliente'].setValue(clienteSeleccionado);
     const products: ArticleSalesDto[] = item.articulosVenta.map(
       (article: ArticleSalesModel) => {
         const productoCompleto = this.listProducts.find(
@@ -288,9 +301,7 @@ export class SalesComponent implements OnInit {
         };
       }
     );
-
-    this.articleSalesList = products;
-    
+    this.articleSalesList = products;    
   }
 
   async save() {
