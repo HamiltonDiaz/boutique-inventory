@@ -267,7 +267,7 @@ export class SalesComponent implements OnInit {
       id_venta: Number(this.idRegisterToEdit),
       id_cliente: formValues.id_cliente,
       id_usuario: localStorage.getItem('user_id') ?? '',
-      fecha: new Date().toISOString(),
+      fecha: Date.now().toString(),
       articulosVenta: this.articleSalesList,
     };
   }
@@ -280,7 +280,7 @@ export class SalesComponent implements OnInit {
         const productoCompleto = this.listProducts.find(
           (item) => item.id === article.id_pxc.toString()
         );
-
+        
         return {
           id_pxc: article.id_axv.toString(),
           cantidad_vendida: article.cantidad_vendida,
@@ -290,7 +290,7 @@ export class SalesComponent implements OnInit {
     );
 
     this.articleSalesList = products;
-
+    
   }
 
   async save() {
