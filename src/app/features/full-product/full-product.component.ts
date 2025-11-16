@@ -135,7 +135,7 @@ export class FullProductComponent implements OnInit {
       minWidth: '8rem',
       order: true,
       filterable: true,
-    },    
+    },
     {
       field: 'actions',
       header: 'Acciones',
@@ -234,7 +234,7 @@ export class FullProductComponent implements OnInit {
     this.dataForTable = response.data;
   }
   hideDialog(): void {
-    this.frm.get('id_producto')?.disable();    
+    this.frm.get('id_producto')?.disable();
     this.createEditDialog = false;
     this.createRegister = true;
     this.clearForm();
@@ -283,7 +283,12 @@ export class FullProductComponent implements OnInit {
 
   createFormdata(data: CreateFullProductDto | UpdateFullProductDto): FormData {
     const formData = new FormData();
-    formData.append('foto', this.selectedFile!);
+    if (this.selectedFile) {
+      formData.append('foto', this.selectedFile);
+    } else if (data.foto) {
+      // Si se edita y existe valor (ruta / nombre) conservarlo como string
+      formData.append('foto', data.foto);
+    }
     formData.append('id_pxc', data.id_pxc.toString());
     formData.append('id_producto', data.id_producto.toString());
     formData.append('id_talla', data.id_talla.toString());
@@ -295,10 +300,8 @@ export class FullProductComponent implements OnInit {
   }
 
   async save() {
-    this.alertImageVisible =
-      this.selectedFile == null && (this.frm.controls['foto'].value === '' || this.frm.controls['foto'].value == null);
 
-    if (this.frm.invalid || this.alertImageVisible) {
+    if (this.frm.invalid) {
       this.frm.markAllAsTouched();
       this.messageService.add({
         severity: 'error',
